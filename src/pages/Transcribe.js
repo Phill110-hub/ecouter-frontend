@@ -67,6 +67,9 @@ function Transcribe() {
 
       if (data.status === 'complete') {
         setTranscript(data.text);
+        setSummary(data.summary || '');
+        setTopic(data.topic || '');
+
         const fullAudioUrl = `${API_BASE_URL}${data.audio_url}`;
         setAudioUrl(fullAudioUrl);
 
@@ -78,14 +81,11 @@ function Transcribe() {
         });
         setWordList(allWords);
 
-        setSummary(data.summary || '');
-        setTopic(data.topic || '');
-
         localStorage.setItem('transcript', data.text);
-        localStorage.setItem('audioUrl', fullAudioUrl);
-        localStorage.setItem('wordList', JSON.stringify(allWords));
         localStorage.setItem('summary', data.summary || '');
         localStorage.setItem('topic', data.topic || '');
+        localStorage.setItem('audioUrl', fullAudioUrl);
+        localStorage.setItem('wordList', JSON.stringify(allWords));
         localStorage.removeItem('processingId');
         setProcessingTranscriptId(null);
       } else {
@@ -101,10 +101,10 @@ function Transcribe() {
 
     setLoading(true);
     setTranscript('');
-    setAudioUrl('');
-    setWordList([]);
     setSummary('');
     setTopic('');
+    setAudioUrl('');
+    setWordList([]);
     localStorage.clear();
 
     const formData = new FormData();
@@ -117,9 +117,9 @@ function Transcribe() {
       formData.append('project_id', selectedProjectId);
     }
 
-    if (tags) {
-      formData.append('tags', tags);
-    }
+    tags.split(',').map(tag => tag.trim()).filter(tag => tag).forEach(tag => {
+      formData.append('tags', tag);
+    });
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
@@ -137,9 +137,9 @@ function Transcribe() {
           pollTranscriptStatus(data.id);
         } else {
           setTranscript(data.transcript);
-          setAudioUrl(data.audio_url);
           setSummary(data.summary || '');
           setTopic(data.topic || '');
+          setAudioUrl(data.audio_url);
 
           const allWords = [];
           data.word_timings?.forEach(segment => {
@@ -150,10 +150,10 @@ function Transcribe() {
           setWordList(allWords);
 
           localStorage.setItem('transcript', data.transcript);
-          localStorage.setItem('audioUrl', data.audio_url);
-          localStorage.setItem('wordList', JSON.stringify(allWords));
           localStorage.setItem('summary', data.summary || '');
           localStorage.setItem('topic', data.topic || '');
+          localStorage.setItem('audioUrl', data.audio_url);
+          localStorage.setItem('wordList', JSON.stringify(allWords));
         }
       } else {
         alert(data.error || 'Transcription failed.');
@@ -205,16 +205,8 @@ function Transcribe() {
         </div>
 
         <div className="transcribe-checkboxes">
-          <label>
-            <input type="checkbox" checked={verbatim} onChange={() => setVerbatim(!verbatim)} />
-            Verbatim transcription
-          </label>
-
-          <label>
-            <input type="checkbox" checked={diarization} onChange={() => setDiarization(!diarization)} />
-            Identify speakers
-          </label>
-
+          <label><input type="checkbox" checked={verbatim} onChange={() => setVerbatim(!verbatim)} /> Verbatim</label>
+          <label><input type="checkbox" checked={diarization} onChange={() => setDiarization(!diarization)} /> Identify Speakers</label>
           <label>
             Language:
             <select value={language} onChange={(e) => setLanguage(e.target.value)}>
@@ -270,19 +262,22 @@ function Transcribe() {
               ))}
             </div>
           )}
+        </div>
+      )}
 
+      {(summary || topic) && (
+        <div className="summary-box">
           {topic && (
-            <div className="ai-topic">
-              <h3>🧠 AI Topic:</h3>
+            <>
+              <h3>Topic:</h3>
               <p>{topic}</p>
-            </div>
+            </>
           )}
-
           {summary && (
-            <div className="ai-summary">
-              <h3>📝 AI Summary:</h3>
+            <>
+              <h3>Summary:</h3>
               <p>{summary}</p>
-            </div>
+            </>
           )}
         </div>
       )}
