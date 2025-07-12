@@ -13,18 +13,19 @@ export const AuthProvider = ({ children }) => {
   const fetchSession = async () => {
     try {
       const res = await axios.get(
-        'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/api/session',
+        `${process.env.REACT_APP_API_URL}/api/session`,
         { withCredentials: true }
       );
-      if (res.data && res.data.authenticated) {
+
+      if (res.data && res.data.email) {
         setIsAuthenticated(true);
-        setUser(res.data.user);
+        setUser(res.data);
       } else {
         setIsAuthenticated(false);
         setUser(null);
       }
     } catch (err) {
-      console.error('Session check failed:', err);
+      console.error('❌ Session check failed:', err);
       setIsAuthenticated(false);
       setUser(null);
     } finally {
@@ -45,12 +46,12 @@ export const AuthProvider = ({ children }) => {
     setLogoutLoading(true);
     try {
       await axios.post(
-        'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/api/logout',
+        `${process.env.REACT_APP_API_URL}/logout`,
         {},
         { withCredentials: true }
       );
     } catch (err) {
-      console.error('Logout failed:', err);
+      console.error('❌ Logout failed:', err);
     } finally {
       setIsAuthenticated(false);
       setUser(null);
