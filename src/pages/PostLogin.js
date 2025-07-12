@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import api from './axios'; // ✅ Use axios instance
 
 function PostLogin() {
   const navigate = useNavigate();
@@ -9,14 +10,9 @@ function PostLogin() {
   useEffect(() => {
     console.log("🔄 PostLogin mounted");
 
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-    fetch(`${API_URL}/api/session`, { credentials: 'include' })
+    api.get('/api/session')
       .then(res => {
-        console.log("🛰️ /api/session response status:", res.status);
-        return res.json();
-      })
-      .then(data => {
+        const data = res.data;
         console.log("📦 Session data:", data);
 
         if (data && data.email) {
@@ -35,7 +31,7 @@ function PostLogin() {
         }
       })
       .catch(err => {
-        console.error("🚫 Fetch error:", err);
+        console.error("🚫 API error:", err);
         navigate('/login');
       });
   }, [navigate, setIsAuthenticated, setUser]);
