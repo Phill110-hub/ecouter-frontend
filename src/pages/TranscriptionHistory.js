@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './dashboard.css';
 
+const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
+
 const TranscriptionHistory = () => {
   const [transcriptions, setTranscriptions] = useState([]);
   const [selectedTranscript, setSelectedTranscript] = useState(null);
@@ -11,7 +13,7 @@ const TranscriptionHistory = () => {
   const [languageMap, setLanguageMap] = useState({});
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/transcripts', {
+    fetch(`${API_BASE_URL}/api/transcripts`, {
       method: 'GET',
       credentials: 'include'
     })
@@ -21,7 +23,7 @@ const TranscriptionHistory = () => {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/translate/languages')
+    fetch(`${API_BASE_URL}/api/translate/languages`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
@@ -47,7 +49,7 @@ const TranscriptionHistory = () => {
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this transcript? This cannot be undone.")) return;
 
-    fetch(`http://localhost:5000/api/transcripts/${id}`, {
+    fetch(`${API_BASE_URL}/api/transcripts/${id}`, {
       method: 'DELETE',
       credentials: 'include'
     }).then(res => {
@@ -72,7 +74,7 @@ const TranscriptionHistory = () => {
     setTranslatingId(id);
     setTranslatedText('');
     try {
-      const res = await fetch(`http://localhost:5000/api/translate/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/translate/${id}`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -107,7 +109,6 @@ const TranscriptionHistory = () => {
               <strong>{t.filename}</strong>
               <p>{t.text ? t.text.slice(0, 100) + '...' : 'No transcript available.'}</p>
 
-              {/* ✅ Show tags */}
               {t.tags && t.tags.length > 0 && (
                 <div className="tag-box">
                   <strong>Tags:</strong>
@@ -154,7 +155,7 @@ const TranscriptionHistory = () => {
                 </button>
 
                 <audio controls style={{ marginTop: '10px' }}>
-                  <source src={`http://localhost:5000/uploads/${encodeURIComponent(t.filename)}`} />
+                  <source src={`${API_BASE_URL}/uploads/${encodeURIComponent(t.filename)}`} />
                   Your browser does not support the audio element.
                 </audio>
               </div>
