@@ -13,6 +13,8 @@ function Transcribe() {
   const [selectedProjectId, setSelectedProjectId] = useState('');
 
   const [transcript, setTranscript] = useState(localStorage.getItem('transcript') || '');
+  const [summary, setSummary] = useState(localStorage.getItem('summary') || '');
+  const [topic, setTopic] = useState(localStorage.getItem('topic') || '');
   const [audioUrl, setAudioUrl] = useState(localStorage.getItem('audioUrl') || '');
   const [wordList, setWordList] = useState(JSON.parse(localStorage.getItem('wordList')) || []);
   const [loading, setLoading] = useState(false);
@@ -76,9 +78,14 @@ function Transcribe() {
         });
         setWordList(allWords);
 
+        setSummary(data.summary || '');
+        setTopic(data.topic || '');
+
         localStorage.setItem('transcript', data.text);
         localStorage.setItem('audioUrl', fullAudioUrl);
         localStorage.setItem('wordList', JSON.stringify(allWords));
+        localStorage.setItem('summary', data.summary || '');
+        localStorage.setItem('topic', data.topic || '');
         localStorage.removeItem('processingId');
         setProcessingTranscriptId(null);
       } else {
@@ -96,6 +103,8 @@ function Transcribe() {
     setTranscript('');
     setAudioUrl('');
     setWordList([]);
+    setSummary('');
+    setTopic('');
     localStorage.clear();
 
     const formData = new FormData();
@@ -108,9 +117,9 @@ function Transcribe() {
       formData.append('project_id', selectedProjectId);
     }
 
-    tags.split(',').map(tag => tag.trim()).filter(tag => tag).forEach(tag => {
-      formData.append('tags', tag);
-    });
+    if (tags) {
+      formData.append('tags', tags);
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
@@ -129,6 +138,8 @@ function Transcribe() {
         } else {
           setTranscript(data.transcript);
           setAudioUrl(data.audio_url);
+          setSummary(data.summary || '');
+          setTopic(data.topic || '');
 
           const allWords = [];
           data.word_timings?.forEach(segment => {
@@ -141,6 +152,8 @@ function Transcribe() {
           localStorage.setItem('transcript', data.transcript);
           localStorage.setItem('audioUrl', data.audio_url);
           localStorage.setItem('wordList', JSON.stringify(allWords));
+          localStorage.setItem('summary', data.summary || '');
+          localStorage.setItem('topic', data.topic || '');
         }
       } else {
         alert(data.error || 'Transcription failed.');
@@ -255,6 +268,20 @@ function Transcribe() {
               {transcript.split('\n\n').map((para, i) => (
                 <p key={i}>{para}</p>
               ))}
+            </div>
+          )}
+
+          {topic && (
+            <div className="ai-topic">
+              <h3>🧠 AI Topic:</h3>
+              <p>{topic}</p>
+            </div>
+          )}
+
+          {summary && (
+            <div className="ai-summary">
+              <h3>📝 AI Summary:</h3>
+              <p>{summary}</p>
             </div>
           )}
         </div>
