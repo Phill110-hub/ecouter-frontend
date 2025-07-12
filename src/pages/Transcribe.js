@@ -24,30 +24,14 @@ function Transcribe() {
   const audioRef = useRef(null);
 
   const languageOptions = [
-    { code: 'en', name: 'English' },
-    { code: 'fr', name: 'French' },
-    { code: 'es', name: 'Spanish' },
-    { code: 'sw', name: 'Swahili' },
-    { code: 'de', name: 'German' },
-    { code: 'ar', name: 'Arabic' },
-    { code: 'hi', name: 'Hindi' },
-    { code: 'zh', name: 'Chinese' },
-    { code: 'ru', name: 'Russian' },
-    { code: 'pt', name: 'Portuguese' },
-    { code: 'it', name: 'Italian' },
-    { code: 'ko', name: 'Korean' },
-    { code: 'ja', name: 'Japanese' },
-    { code: 'tr', name: 'Turkish' },
-    { code: 'nl', name: 'Dutch' },
-    { code: 'pl', name: 'Polish' },
-    { code: 'uk', name: 'Ukrainian' },
-    { code: 'el', name: 'Greek' },
-    { code: 'he', name: 'Hebrew' },
-    { code: 'bn', name: 'Bengali' },
-    { code: 'ta', name: 'Tamil' },
-    { code: 'ur', name: 'Urdu' },
-    { code: 'zu', name: 'Zulu' },
-    { code: 'am', name: 'Amharic' },
+    { code: 'en', name: 'English' }, { code: 'fr', name: 'French' }, { code: 'es', name: 'Spanish' },
+    { code: 'sw', name: 'Swahili' }, { code: 'de', name: 'German' }, { code: 'ar', name: 'Arabic' },
+    { code: 'hi', name: 'Hindi' }, { code: 'zh', name: 'Chinese' }, { code: 'ru', name: 'Russian' },
+    { code: 'pt', name: 'Portuguese' }, { code: 'it', name: 'Italian' }, { code: 'ko', name: 'Korean' },
+    { code: 'ja', name: 'Japanese' }, { code: 'tr', name: 'Turkish' }, { code: 'nl', name: 'Dutch' },
+    { code: 'pl', name: 'Polish' }, { code: 'uk', name: 'Ukrainian' }, { code: 'el', name: 'Greek' },
+    { code: 'he', name: 'Hebrew' }, { code: 'bn', name: 'Bengali' }, { code: 'ta', name: 'Tamil' },
+    { code: 'ur', name: 'Urdu' }, { code: 'zu', name: 'Zulu' }, { code: 'am', name: 'Amharic' },
     { code: 'yo', name: 'Yoruba' }
   ];
 
@@ -69,7 +53,6 @@ function Transcribe() {
         setTranscript(data.text);
         setSummary(data.summary || '');
         setTopic(data.topic || '');
-
         const fullAudioUrl = `${API_BASE_URL}${data.audio_url}`;
         setAudioUrl(fullAudioUrl);
 
@@ -117,9 +100,7 @@ function Transcribe() {
       formData.append('project_id', selectedProjectId);
     }
 
-    tags.split(',').map(tag => tag.trim()).filter(tag => tag).forEach(tag => {
-      formData.append('tags', tag);
-    });
+    formData.append('tags', tags);
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
@@ -131,30 +112,19 @@ function Transcribe() {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.status === 'processing') {
-          setProcessingTranscriptId(data.id);
-          localStorage.setItem('processingId', data.id);
-          pollTranscriptStatus(data.id);
-        } else {
-          setTranscript(data.transcript);
-          setSummary(data.summary || '');
-          setTopic(data.topic || '');
-          setAudioUrl(data.audio_url);
+        setTranscript(data.transcript);
+        setSummary(data.summary || '');
+        setTopic(data.topic || '');
+        setAudioUrl(data.audio_url);
 
-          const allWords = [];
-          data.word_timings?.forEach(segment => {
-            if (segment.words) {
-              segment.words.forEach(word => allWords.push(word));
-            }
-          });
-          setWordList(allWords);
+        const allWords = Array.isArray(data.word_timings) ? data.word_timings : [];
+        setWordList(allWords);
 
-          localStorage.setItem('transcript', data.transcript);
-          localStorage.setItem('summary', data.summary || '');
-          localStorage.setItem('topic', data.topic || '');
-          localStorage.setItem('audioUrl', data.audio_url);
-          localStorage.setItem('wordList', JSON.stringify(allWords));
-        }
+        localStorage.setItem('transcript', data.transcript);
+        localStorage.setItem('summary', data.summary || '');
+        localStorage.setItem('topic', data.topic || '');
+        localStorage.setItem('audioUrl', data.audio_url);
+        localStorage.setItem('wordList', JSON.stringify(allWords));
       } else {
         alert(data.error || 'Transcription failed.');
       }
@@ -173,7 +143,7 @@ function Transcribe() {
     const onTimeUpdate = () => {
       const currentTime = audio.currentTime;
       const index = wordList.findIndex(word =>
-        currentTime >= word.start && currentTime <= word.end
+        currentTime >= word.start / 1000 && currentTime <= word.end / 1000
       );
       setActiveWordIndex(index);
     };
