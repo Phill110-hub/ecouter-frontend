@@ -7,7 +7,7 @@ function Transcribe() {
   const [file, setFile] = useState(null);
   const [verbatim, setVerbatim] = useState(false);
   const [diarization, setDiarization] = useState(false);
-  const [useAISummary, setUseAISummary] = useState(true); // ✅ NEW: AI Summary toggle
+  const [useAISummary, setUseAISummary] = useState(true);
   const [language, setLanguage] = useState('en');
   const [tags, setTags] = useState('');
   const [projects, setProjects] = useState([]);
@@ -96,7 +96,7 @@ function Transcribe() {
     formData.append('verbatim', verbatim);
     formData.append('diarization', diarization);
     formData.append('language', language);
-    formData.append('use_ai_summary', useAISummary); // ✅ Include toggle value
+    formData.append('use_ai_summary', useAISummary);
 
     if (selectedProjectId) {
       formData.append('project_id', selectedProjectId);
