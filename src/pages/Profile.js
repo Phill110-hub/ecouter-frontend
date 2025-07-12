@@ -10,6 +10,9 @@ const countries = [
   "South Africa", "Nigeria", "Kenya", "Mexico", "Russia", "Italy", "Spain", "Netherlands", "Sweden", "Norway",
 ];
 
+// ✅ Use deployed backend URL
+const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
+
 const Profile = () => {
   const location = useLocation();
 
@@ -31,7 +34,7 @@ const Profile = () => {
 
   const fetchUserProfile = () => {
     axios
-      .get('http://localhost:5000/api/profile', { withCredentials: true })
+      .get(`${API_BASE_URL}/api/profile`, { withCredentials: true })
       .then((res) => {
         setUserData(res.data);
       })
@@ -58,7 +61,7 @@ const Profile = () => {
     formData.append('age', userData.age);
 
     axios
-      .put('http://localhost:5000/api/profile', formData, {
+      .put(`${API_BASE_URL}/api/profile`, formData, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },
       })
@@ -81,7 +84,7 @@ const Profile = () => {
 
     axios
       .post(
-        'http://localhost:5000/api/delete-account',
+        `${API_BASE_URL}/api/delete-account`,
         { password },
         { withCredentials: true }
       )
