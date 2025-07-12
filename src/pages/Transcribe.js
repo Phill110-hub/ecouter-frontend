@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Transcribe.css';
 
+const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
+
 function Transcribe() {
   const [file, setFile] = useState(null);
   const [verbatim, setVerbatim] = useState(false);
@@ -48,7 +50,7 @@ function Transcribe() {
   ];
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/projects', { credentials: 'include' })
+    fetch(`${API_BASE_URL}/api/projects`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error("Failed to load projects:", err));
@@ -56,14 +58,14 @@ function Transcribe() {
 
   const pollTranscriptStatus = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/transcripts/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/transcripts/${id}`, {
         credentials: 'include',
       });
       const data = await res.json();
 
       if (data.status === 'complete') {
         setTranscript(data.text);
-        const fullAudioUrl = `http://localhost:5000${data.audio_url}`;
+        const fullAudioUrl = `${API_BASE_URL}${data.audio_url}`;
         setAudioUrl(fullAudioUrl);
 
         const allWords = [];
@@ -111,7 +113,7 @@ function Transcribe() {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/transcribe', {
+      const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
