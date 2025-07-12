@@ -10,12 +10,15 @@ export const AuthProvider = ({ children }) => {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [user, setUser] = useState(null);
 
+  const API_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev'; // ✅ Hardcoded for test
+
   const fetchSession = async () => {
     try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/session`,
-        { withCredentials: true }
-      );
+      console.log('🌍 Using API URL:', API_URL);
+      const res = await axios.get(`${API_URL}/api/session`, {
+        withCredentials: true,
+      });
+      console.log('📡 API session response:', res.data);
 
       if (res.data && res.data.email) {
         setIsAuthenticated(true);
@@ -45,11 +48,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLogoutLoading(true);
     try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/logout`,
-        {},
-        { withCredentials: true }
-      );
+      await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
     } catch (err) {
       console.error('❌ Logout failed:', err);
     } finally {
