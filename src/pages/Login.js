@@ -1,3 +1,4 @@
+// src/pages/Login.js
 import React from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +7,7 @@ function Login() {
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5000/login/google';
+    window.location.href = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/login/google';
   };
 
   return (
@@ -27,7 +28,6 @@ function Login() {
         <span>Continue with Google</span>
       </button>
 
-      {/* ✅ Back to signup link */}
       <p style={{ marginTop: '1.5rem', color: '#888', fontSize: '14px' }}>
         Don’t have an account?{' '}
         <button
