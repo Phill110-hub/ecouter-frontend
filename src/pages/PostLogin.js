@@ -9,7 +9,9 @@ function PostLogin() {
   useEffect(() => {
     console.log("🔄 PostLogin mounted");
 
-    fetch('http://localhost:5000/api/session', { credentials: 'include' })
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+    fetch(`${API_URL}/api/session`, { credentials: 'include' })
       .then(res => {
         console.log("🛰️ /api/session response status:", res.status);
         return res.json();
