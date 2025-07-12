@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
+
 const Tags = () => {
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
@@ -13,7 +15,7 @@ const Tags = () => {
 
   const fetchTags = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/tags', {
+      const res = await fetch(`${API_BASE_URL}/api/tags`, {
         credentials: 'include',
       });
       const data = await res.json();
@@ -28,7 +30,7 @@ const Tags = () => {
     if (!newTag.trim()) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/tags', {
+      const res = await fetch(`${API_BASE_URL}/api/tags`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -39,11 +41,13 @@ const Tags = () => {
       if (res.ok) {
         setTags([...tags, data]);
         setNewTag('');
+        setError('');
       } else {
         setError(data.error || 'Failed to create tag.');
       }
     } catch (err) {
       console.error('Create tag error:', err);
+      setError('Failed to create tag.');
     }
   };
 
@@ -51,7 +55,7 @@ const Tags = () => {
     if (!window.confirm('Are you sure you want to delete this tag?')) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/tags/${tagId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/tags/${tagId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -73,7 +77,7 @@ const Tags = () => {
     if (!editingTagName.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/tags/${editingTagId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/tags/${editingTagId}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
