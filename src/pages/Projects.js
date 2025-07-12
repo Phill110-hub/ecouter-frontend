@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // for routing
 
+const BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
+
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [newProjectName, setNewProjectName] = useState('');
@@ -12,14 +14,14 @@ const Projects = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const navigate = useNavigate(); // <-- enables navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
   }, []);
 
   const fetchProjects = () => {
-    fetch('http://localhost:5000/api/projects', { credentials: 'include' })
+    fetch(`${BASE_URL}/api/projects`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => setProjects(data))
       .catch(err => console.error("Error loading projects:", err));
@@ -32,7 +34,7 @@ const Projects = () => {
     setLoading(true);
     setErrorMsg('');
     try {
-      const res = await fetch('http://localhost:5000/api/projects', {
+      const res = await fetch(`${BASE_URL}/api/projects`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -56,7 +58,7 @@ const Projects = () => {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const res = await fetch(`${BASE_URL}/api/projects/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -79,7 +81,7 @@ const Projects = () => {
 
   const saveEdit = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const res = await fetch(`${BASE_URL}/api/projects/${id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -103,7 +105,7 @@ const Projects = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${id}/transcripts`, {
+      const res = await fetch(`${BASE_URL}/api/projects/${id}/transcripts`, {
         method: 'GET',
         credentials: 'include',
       });
