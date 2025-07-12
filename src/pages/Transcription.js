@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import './transcription.css';
 
+const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
+
 function TranscribeFile() {
   const [file, setFile] = useState(null);
   const [transcript, setTranscript] = useState('');
@@ -25,7 +27,7 @@ function TranscribeFile() {
 
     setLoading(true);
 
-    fetch('http://localhost:5000/api/transcribe', {
+    fetch(`${API_BASE_URL}/api/transcribe`, {
       method: 'POST',
       credentials: 'include',
       body: formData
@@ -38,12 +40,12 @@ function TranscribeFile() {
           setTranscript(data.transcript);
           setSummary(data.summary);
         }
-        setLoading(false);
       })
       .catch(err => {
         console.error('Transcription error:', err);
-        setLoading(false);
-      });
+        alert('An error occurred while transcribing the file.');
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
