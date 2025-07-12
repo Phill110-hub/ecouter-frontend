@@ -1,9 +1,10 @@
+// src/axios.js
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000',
-  withCredentials: true,  // ✅ Required for cookies/session
+  baseURL: 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev',
+  withCredentials: true, // ✅ Required for cookies/session
 });
 
 // Automatically handle session timeouts
