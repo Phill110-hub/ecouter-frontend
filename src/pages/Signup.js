@@ -110,7 +110,8 @@ function Signup() {
       <button
         className="google-button shine-hover"
         onClick={() =>
-          (window.location.href = `${process.env.REACT_APP_API_URL}/login/google`)
+          (window.location.href =
+            'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/login/google')
         }
       >
         <svg
