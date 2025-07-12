@@ -15,9 +15,9 @@ function PostLogin() {
         const data = res.data;
         console.log("📦 Session data:", data);
 
-        if (data && data.email) {
+        if (data && data.user && data.user.email) {
           setIsAuthenticated(true);
-          setUser(data);
+          setUser(data.user);
           console.log("✅ Auth success, redirecting...");
 
           if (data.first_login) {
