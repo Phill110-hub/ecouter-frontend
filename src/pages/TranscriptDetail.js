@@ -7,7 +7,7 @@ const TranscriptDetail = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/transcripts/${id}`, {
+    fetch(`https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/api/transcripts/${id}`, {
       credentials: 'include',
     })
       .then(res => res.json())
@@ -47,7 +47,26 @@ const TranscriptDetail = () => {
         </h2>
         <p><strong>Status:</strong> {transcript.status}</p>
         <p><strong>Created:</strong> {new Date(transcript.created_at).toLocaleString()}</p>
-        <hr style={{ borderTop: '1px solid #555', margin: '20px 0' }} />
+
+        {transcript.topic && (
+          <div style={{ marginTop: '20px' }}>
+            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>🧠 Topic:</h3>
+            <p style={{ color: '#ccc' }}>{transcript.topic}</p>
+          </div>
+        )}
+
+        {transcript.summary && (
+          <div style={{ marginTop: '20px' }}>
+            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>📌 Summary:</h3>
+            <ul style={{ paddingLeft: '20px', color: '#ccc' }}>
+              {transcript.summary.split('\n').map((line, index) => (
+                <li key={index}>{line.replace(/^-/, '').trim()}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <hr style={{ borderTop: '1px solid #555', margin: '30px 0' }} />
 
         <div style={{
           whiteSpace: 'pre-wrap',
