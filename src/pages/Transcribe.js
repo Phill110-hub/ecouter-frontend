@@ -7,6 +7,7 @@ function Transcribe() {
   const [file, setFile] = useState(null);
   const [verbatim, setVerbatim] = useState(false);
   const [diarization, setDiarization] = useState(false);
+  const [useAISummary, setUseAISummary] = useState(true); // ✅ NEW: AI Summary toggle
   const [language, setLanguage] = useState('en');
   const [tags, setTags] = useState('');
   const [projects, setProjects] = useState([]);
@@ -95,6 +96,7 @@ function Transcribe() {
     formData.append('verbatim', verbatim);
     formData.append('diarization', diarization);
     formData.append('language', language);
+    formData.append('use_ai_summary', useAISummary); // ✅ Include toggle value
 
     if (selectedProjectId) {
       formData.append('project_id', selectedProjectId);
@@ -177,6 +179,7 @@ function Transcribe() {
         <div className="transcribe-checkboxes">
           <label><input type="checkbox" checked={verbatim} onChange={() => setVerbatim(!verbatim)} /> Verbatim</label>
           <label><input type="checkbox" checked={diarization} onChange={() => setDiarization(!diarization)} /> Identify Speakers</label>
+          <label><input type="checkbox" checked={useAISummary} onChange={() => setUseAISummary(!useAISummary)} /> Generate AI Summary</label>
           <label>
             Language:
             <select value={language} onChange={(e) => setLanguage(e.target.value)}>
