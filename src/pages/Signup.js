@@ -41,7 +41,6 @@ function Signup() {
     e.preventDefault();
     setLoading(true);
 
-    // Validate form
     if (formData.password !== formData.confirmPassword) {
       setErrors({ confirmPassword: 'Passwords do not match' });
       setLoading(false);
@@ -54,13 +53,13 @@ function Signup() {
       return;
     }
 
-    // Call API to register user (replace with your actual signup endpoint)
     try {
       const response = await fetch('/api/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // ✅ Crucial for session cookies
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -71,7 +70,7 @@ function Signup() {
       const result = await response.json();
       if (response.ok) {
         toast.success('Signup successful! Please check your email to verify.');
-        navigate('/login'); // Redirect to login page after successful signup
+        navigate('/login');
       } else {
         toast.error(result.error || 'An error occurred. Please try again.');
       }
@@ -119,6 +118,10 @@ function Signup() {
           onChange={handleChange}
         />
 
+        {errors.confirmPassword && (
+          <div className="error-message">{errors.confirmPassword}</div>
+        )}
+
         <div className="terms">
           <label>
             <input
@@ -131,12 +134,12 @@ function Signup() {
           </label>
         </div>
 
-        <button
-          className="email-button"
-          type="submit"
-          disabled={loading}
-        >
-          Continue with Email
+        {errors.acceptedTerms && (
+          <div className="error-message">{errors.acceptedTerms}</div>
+        )}
+
+        <button className="email-button" type="submit" disabled={loading}>
+          {loading ? 'Creating Account...' : 'Continue with Email'}
         </button>
       </form>
 
@@ -189,4 +192,5 @@ function Signup() {
 }
 
 export default Signup;
+
 
