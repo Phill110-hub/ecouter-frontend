@@ -3,11 +3,9 @@ import './Signup.css';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useAuth } from '../pages/AuthContext';
 
 function Signup() {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -17,11 +15,7 @@ function Signup() {
     acceptedTerms: false,
   });
 
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-
   const API_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
 
   const handleChange = (e) => {
@@ -71,7 +65,9 @@ function Signup() {
 
       if (res.ok) {
         toast.success(data.message);
-        setEmailSent(true);
+        setTimeout(() => {
+          navigate(`/verify?email=${encodeURIComponent(formData.email)}`);
+        }, 1000);
       } else {
         toast.error(data.error || 'Signup failed.');
       }
@@ -83,114 +79,54 @@ function Signup() {
     }
   };
 
-  const handleVerifyCode = async () => {
-    if (!verificationCode || verificationCode.length !== 6) {
-      toast.error('Enter a valid 6-digit code.');
-      return;
-    }
-
-    setIsVerifying(true);
-
-    try {
-      const res = await fetch(`${API_URL}/verify-code`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: formData.email,
-          code: verificationCode,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success(data.message);
-        login(data.user);
-        setTimeout(() => navigate('/dashboard'), 1000);
-      } else {
-        toast.error(data.error || 'Invalid or expired code.');
-      }
-    } catch (err) {
-      console.error('❌ Verification error:', err);
-      toast.error('Verification failed.');
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
   return (
     <div className="signup-container fade-in">
       <h2 className="signup-title">Join Écouter</h2>
 
-      {!emailSent ? (
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-          <div className="terms">
-            <label>
-              <input
-                type="checkbox"
-                name="acceptedTerms"
-                checked={formData.acceptedTerms}
-                onChange={handleChange}
-              />
-              I accept the <a href="#">Terms and Conditions</a>
-            </label>
-          </div>
-          <button className="email-button" type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Continue with Email'}
-          </button>
-        </form>
-      ) : (
-        <div className="verify-section">
-          <p className="verify-instructions">
-            We've sent a 6-digit verification code to <b>{formData.email}</b>.
-            Enter it below to verify your account.
-          </p>
-          <input
-            type="text"
-            inputMode="numeric"
-            maxLength={6}
-            placeholder="Enter verification code"
-            value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
-          />
-          <button
-            className="verify-button"
-            onClick={handleVerifyCode}
-            disabled={isVerifying}
-          >
-            {isVerifying ? 'Verifying...' : 'Verify Email'}
-          </button>
+      <form className="signup-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+        />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+        />
+        <div className="terms">
+          <label>
+            <input
+              type="checkbox"
+              name="acceptedTerms"
+              checked={formData.acceptedTerms}
+              onChange={handleChange}
+            />
+            I accept the <a href="#">Terms and Conditions</a>
+          </label>
         </div>
-      )}
+        <button className="email-button" type="submit" disabled={loading}>
+          {loading ? 'Creating account...' : 'Continue with Email'}
+        </button>
+      </form>
 
       <button
         className="google-button shine-hover"
