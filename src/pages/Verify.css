@@ -12,9 +12,9 @@ html, body {
 
 /* === Container === */
 .verify-container {
-  max-width: 400px;
+  max-width: 360px;
   width: 90%;
-  padding: 2rem;
+  padding: 1.5rem;
   background: #1e1e1e;
   color: #fff;
   border-radius: 10px;
@@ -23,35 +23,34 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 80vh;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
 }
 
 /* === Heading and Text === */
 .verify-container h2 {
-  margin-bottom: 10px;
-  font-size: 1.8rem;
+  margin-bottom: 8px;
+  font-size: 1.6rem;
 }
 
 .verify-container p {
   font-size: 0.95rem;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   line-height: 1.4;
 }
 
 .verify-container b {
   display: block;
-  margin-bottom: 1.2rem;
-  color: #ffd700;
+  margin-bottom: 1rem;
+  color: #fff; /* changed from #ffd700 (orange) */
   word-wrap: break-word;
 }
 
 /* === Code Input === */
 .code-input {
   width: 100%;
-  padding: 12px;
-  font-size: 18px;
-  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 12px;
   border-radius: 5px;
   border: 1px solid #333;
   background: #2a2a2a;
@@ -60,22 +59,38 @@ html, body {
   letter-spacing: 2px;
 }
 
-/* === Buttons === */
-.verify-btn,
-.resend-btn {
+/* === Button === */
+.verify-btn {
   background: #000;
   color: white;
-  padding: 10px 15px;
-  margin: 10px 5px 0 5px;
+  padding: 10px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
   transition: background 0.3s ease;
   width: 100%;
+  margin-top: 8px;
 }
 
-.verify-btn:hover,
+.verify-btn:hover {
+  background: #333;
+}
+
+/* === Resend Button (if used) === */
+.resend-btn {
+  background: #000;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  width: 100%;
+  margin-top: 10px;
+}
+
 .resend-btn:hover {
   background: #333;
 }
@@ -104,28 +119,22 @@ html, body {
   margin-top: 6px;
 }
 
-/* === Responsive Fixes === */
-@media (max-height: 600px) {
-  .verify-container {
-    min-height: auto;
-    padding: 1.5rem 1rem;
-  }
-}
-
+/* === Responsive Adjustments === */
 @media (max-width: 400px) {
   .verify-container h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .code-input {
-    font-size: 16px;
+    font-size: 15px;
     padding: 10px;
   }
 
   .verify-btn,
   .resend-btn {
     font-size: 0.9rem;
-    padding: 8px 10px;
+    padding: 10px;
   }
 }
+
 
