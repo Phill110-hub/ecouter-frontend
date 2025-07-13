@@ -15,19 +15,10 @@ function Signup() {
     acceptedTerms: false,
   });
 
-  const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (submitted) {
-      const timer = setTimeout(() => {
-        setErrors({});
-        setSubmitted(false);
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [submitted]);
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -37,74 +28,162 @@ function Signup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const { name, email, password, confirmPassword, acceptedTerms } = formData;
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error('Please fill in all required fields.');
+      return false;
+    }
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match.');
+      return false;
+    }
+    if (!acceptedTerms) {
+      toast.error('You must accept the Terms and Conditions.');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.info('Email signup is disabled during development. Please use Google Sign-In instead.');
+    if (!validateForm()) return;
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message);
+        setEmailSent(true);
+      } else {
+        toast.error(data.error || 'Signup failed.');
+      }
+    } catch (err) {
+      toast.error('An error occurred during signup.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast.error('Enter a valid 6-digit code.');
+      return;
+    }
+
+    setIsVerifying(true);
+
+    try {
+      const res = await fetch('/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          code: verificationCode,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message);
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        toast.error(data.error || 'Invalid or expired code.');
+      }
+    } catch (err) {
+      toast.error('Verification failed.');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (
     <div className="signup-container fade-in">
       <h2 className="signup-title">Join Écouter</h2>
 
-      <form className="signup-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          disabled
-        />
+      {!emailSent ? (
+        <form className="signup-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+          />
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          disabled
-        />
+          <div className="terms">
+            <label>
+              <input
+                type="checkbox"
+                name="acceptedTerms"
+                checked={formData.acceptedTerms}
+                onChange={handleChange}
+              />
+              I accept the <a href="#">Terms and Conditions</a>
+            </label>
+          </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          disabled
-        />
-
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          disabled
-        />
-
-        <div className="terms">
-          <label>
-            <input
-              type="checkbox"
-              name="acceptedTerms"
-              checked={formData.acceptedTerms}
-              onChange={handleChange}
-              disabled
-            />
-            I accept the <a href="#">Terms and Conditions</a>
-          </label>
+          <button className="email-button" type="submit" disabled={loading}>
+            {loading ? 'Creating account...' : 'Continue with Email'}
+          </button>
+        </form>
+      ) : (
+        <div className="verify-section">
+          <p className="verify-instructions">
+            We've sent a 6-digit verification code to <b>{formData.email}</b>.
+            Enter it below to verify your account.
+          </p>
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="Enter verification code"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+          />
+          <button
+            className="verify-button"
+            onClick={handleVerifyCode}
+            disabled={isVerifying}
+          >
+            {isVerifying ? 'Verifying...' : 'Verify Email'}
+          </button>
         </div>
-
-        <button
-          className="email-button"
-          type="submit"
-          disabled={loading}
-          style={{ cursor: 'not-allowed', opacity: 0.6 }}
-        >
-          Continue with Email (Disabled)
-        </button>
-      </form>
+      )}
 
       {/* Google Sign-In */}
       <button
@@ -155,5 +234,6 @@ function Signup() {
 }
 
 export default Signup;
+
 
 
