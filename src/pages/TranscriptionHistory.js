@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './TranscriptonHistory.css';
+import './TranscriptionHistory.css'; // Correct CSS file
 
 const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
 
@@ -144,7 +144,7 @@ const TranscriptionHistory = () => {
     <div className="content-area fade-in">
       <div className="transcription-header">
         <h2>{showDeleted ? "Deleted Transcripts" : "Your Transcribed Files"}</h2>
-        <div className="button-group right-align">
+        <div className="button-group right-buttons">
           {!showDeleted && transcriptions.length > 0 && (
             <button onClick={handleDeleteAll} className="danger-btn" disabled={buttonsDisabled}>
               Delete All
@@ -248,4 +248,5 @@ const TranscriptionHistory = () => {
 };
 
 export default TranscriptionHistory;
+
 
