@@ -37,9 +37,49 @@ function Signup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.info('Email signup is disabled during development. Please use Google Sign-In instead.');
+    setLoading(true);
+
+    // Validate form
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: 'Passwords do not match' });
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.acceptedTerms) {
+      setErrors({ acceptedTerms: 'You must accept the terms and conditions' });
+      setLoading(false);
+      return;
+    }
+
+    // Call API to register user (replace with your actual signup endpoint)
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast.success('Signup successful! Please check your email to verify.');
+        navigate('/login'); // Redirect to login page after successful signup
+      } else {
+        toast.error(result.error || 'An error occurred. Please try again.');
+      }
+    } catch (error) {
+      toast.error('Failed to sign up. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,7 +93,6 @@ function Signup() {
           placeholder="Full Name"
           value={formData.name}
           onChange={handleChange}
-          disabled
         />
 
         <input
@@ -62,7 +101,6 @@ function Signup() {
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          disabled
         />
 
         <input
@@ -71,7 +109,6 @@ function Signup() {
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          disabled
         />
 
         <input
@@ -80,7 +117,6 @@ function Signup() {
           placeholder="Confirm Password"
           value={formData.confirmPassword}
           onChange={handleChange}
-          disabled
         />
 
         <div className="terms">
@@ -90,7 +126,6 @@ function Signup() {
               name="acceptedTerms"
               checked={formData.acceptedTerms}
               onChange={handleChange}
-              disabled
             />
             I accept the <a href="#">Terms and Conditions</a>
           </label>
@@ -100,9 +135,8 @@ function Signup() {
           className="email-button"
           type="submit"
           disabled={loading}
-          style={{ cursor: 'not-allowed', opacity: 0.6 }}
         >
-          Continue with Email (Disabled)
+          Continue with Email
         </button>
       </form>
 
@@ -155,3 +189,4 @@ function Signup() {
 }
 
 export default Signup;
+
