@@ -12,7 +12,7 @@ const TranscriptionHistory = () => {
   const [languages, setLanguages] = useState([]);
   const [languageMap, setLanguageMap] = useState({});
   const [showDeleted, setShowDeleted] = useState(false);
-  const [buttonsDisabled, setButtonsDisabled] = useState(true);  // Disable buttons flag
+  const [buttonsDisabled, setButtonsDisabled] = useState(true);  // Disable "Delete All" and "Show Deleted" buttons
 
   useEffect(() => {
     fetchTranscripts();
@@ -145,10 +145,15 @@ const TranscriptionHistory = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>{showDeleted ? "Deleted Transcripts" : "Your Transcribed Files"}</h2>
         <div>
-          {/* Disable the Delete and Show Deleted buttons with "Coming Soon" message */}
+          {/* "Coming Soon" message above the buttons */}
+          <div style={{ marginBottom: '10px', color: '#ff5555', fontWeight: 'bold' }}>
+            Coming Soon
+          </div>
+
+          {/* Disable only the Delete All and Show Deleted buttons */}
           {!showDeleted && transcriptions.length > 0 && (
             <button onClick={handleDeleteAll} style={{ marginRight: '10px', background: '#aa3333', color: 'white' }} disabled={buttonsDisabled}>
-              Coming Soon (Delete All)
+              Delete All
             </button>
           )}
           <button 
@@ -156,7 +161,7 @@ const TranscriptionHistory = () => {
             disabled={buttonsDisabled}
             style={{ marginRight: '10px', background: '#aa3333', color: 'white' }}
           >
-            Coming Soon (Show Deleted)
+            Show Deleted
           </button>
         </div>
       </div>
@@ -249,3 +254,4 @@ const TranscriptionHistory = () => {
 };
 
 export default TranscriptionHistory;
+
