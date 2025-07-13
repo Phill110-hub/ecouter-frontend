@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './dashboard.css';
+import './TranscriptonHistory.css';
 
 const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
 
