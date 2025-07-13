@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function Signup() {
   const navigate = useNavigate();
-  const backendURL = import.meta.env.VITE_BACKEND_URL || '';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -38,58 +37,9 @@ function Signup() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    const newErrors = {};
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    if (!formData.acceptedTerms) {
-      newErrors.acceptedTerms = 'You must accept the terms and conditions';
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setSubmitted(true);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${backendURL}/api/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // ✅ Ensures session cookies are handled
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success('Signup successful! Please check your email to verify.');
-        navigate('/login');
-      } else {
-        toast.error(result.error || 'An error occurred. Please try again.');
-      }
-    } catch (error) {
-      toast.error('Failed to sign up. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignup = () => {
-    window.location.href = `${backendURL}/login/google`;
+    toast.info('Email signup is disabled during development. Please use Google Sign-In instead.');
   };
 
   return (
@@ -103,7 +53,7 @@ function Signup() {
           placeholder="Full Name"
           value={formData.name}
           onChange={handleChange}
-          required
+          disabled
         />
 
         <input
@@ -112,7 +62,7 @@ function Signup() {
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          required
+          disabled
         />
 
         <input
@@ -121,7 +71,7 @@ function Signup() {
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          required
+          disabled
         />
 
         <input
@@ -130,12 +80,8 @@ function Signup() {
           placeholder="Confirm Password"
           value={formData.confirmPassword}
           onChange={handleChange}
-          required
+          disabled
         />
-
-        {errors.confirmPassword && (
-          <div className="error-message">{errors.confirmPassword}</div>
-        )}
 
         <div className="terms">
           <label>
@@ -144,22 +90,30 @@ function Signup() {
               name="acceptedTerms"
               checked={formData.acceptedTerms}
               onChange={handleChange}
+              disabled
             />
-            I accept the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms and Conditions</a>
+            I accept the <a href="#">Terms and Conditions</a>
           </label>
         </div>
 
-        {errors.acceptedTerms && (
-          <div className="error-message">{errors.acceptedTerms}</div>
-        )}
-
-        <button className="email-button" type="submit" disabled={loading}>
-          {loading ? 'Creating Account...' : 'Continue with Email'}
+        <button
+          className="email-button"
+          type="submit"
+          disabled={loading}
+          style={{ cursor: 'not-allowed', opacity: 0.6 }}
+        >
+          Continue with Email (Disabled)
         </button>
       </form>
 
       {/* Google Sign-In */}
-      <button className="google-button shine-hover" onClick={handleGoogleSignup}>
+      <button
+        className="google-button shine-hover"
+        onClick={() =>
+          (window.location.href =
+            'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/login/google')
+        }
+      >
         <svg
           className="google-logo"
           xmlns="http://www.w3.org/2000/svg"
@@ -201,5 +155,4 @@ function Signup() {
 }
 
 export default Signup;
-
 
