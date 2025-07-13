@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './TranscriptionHistory.css';
+import './dashboard.css';
 
 const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
 
@@ -56,6 +56,7 @@ const TranscriptionHistory = () => {
 
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this transcript?")) return;
+
     fetch(`${API_BASE_URL}/api/transcripts/${id}`, {
       method: 'DELETE',
       credentials: 'include'
@@ -70,6 +71,7 @@ const TranscriptionHistory = () => {
 
   const handleDeleteAll = () => {
     if (!window.confirm("Delete ALL transcriptions? This cannot be undone!")) return;
+
     Promise.all(
       transcriptions.map(t =>
         fetch(`${API_BASE_URL}/api/transcripts/${t.id}`, {
@@ -139,19 +141,18 @@ const TranscriptionHistory = () => {
   };
 
   return (
-    <div className="transcription-container fade-in">
+    <div className="content-area fade-in">
       <div className="transcription-header">
         <h2>{showDeleted ? "Deleted Transcripts" : "Your Transcribed Files"}</h2>
-        <div className="button-group">
-          <div className="coming-soon">Coming Soon</div>
+        <div className="button-group right-align">
           {!showDeleted && transcriptions.length > 0 && (
-            <button onClick={handleDeleteAll} className="btn danger" disabled={buttonsDisabled}>
+            <button onClick={handleDeleteAll} className="danger-btn" disabled={buttonsDisabled}>
               Delete All
             </button>
           )}
           <button
             onClick={() => setShowDeleted(!showDeleted)}
-            className="btn danger"
+            className="danger-btn"
             disabled={buttonsDisabled}
           >
             {showDeleted ? "Show Active" : "Show Deleted"}
@@ -160,7 +161,7 @@ const TranscriptionHistory = () => {
       </div>
 
       {transcriptions.length === 0 ? (
-        <p className="empty-message">No {showDeleted ? "deleted" : "active"} transcriptions found.</p>
+        <p className="empty-msg">No {showDeleted ? "deleted" : "active"} transcriptions found.</p>
       ) : (
         <ul className="transcription-list fade-in">
           {transcriptions.map(t => (
@@ -247,3 +248,4 @@ const TranscriptionHistory = () => {
 };
 
 export default TranscriptionHistory;
+
