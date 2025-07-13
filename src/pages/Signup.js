@@ -15,10 +15,19 @@ function Signup() {
     acceptedTerms: false,
   });
 
-  const [code, setCode] = useState('');
-  const [showCodeInput, setShowCodeInput] = useState(false);
-  const [emailForVerification, setEmailForVerification] = useState('');
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (submitted) {
+      const timer = setTimeout(() => {
+        setErrors({});
+        setSubmitted(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitted]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,158 +37,81 @@ function Signup() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
-    if (!formData.acceptedTerms) {
-      toast.error('You must accept the terms and conditions');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(data.message);
-        setEmailForVerification(formData.email);
-        setShowCodeInput(true);
-      } else {
-        toast.error(data.error || 'Signup failed');
-      }
-    } catch (err) {
-      toast.error('Server error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyCode = async () => {
-    if (!code) {
-      toast.error('Please enter the verification code');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/verify-code`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emailForVerification,
-          code,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success('Email verified! You can now log in.');
-        navigate('/login');
-      } else {
-        toast.error(data.error || 'Verification failed');
-      }
-    } catch (err) {
-      toast.error('Verification error');
-    } finally {
-      setLoading(false);
-    }
+    toast.info('Email signup is disabled during development. Please use Google Sign-In instead.');
   };
 
   return (
     <div className="signup-container fade-in">
       <h2 className="signup-title">Join Écouter</h2>
 
-      {!showCodeInput ? (
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+      <form className="signup-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
+          disabled
+        />
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          disabled
+        />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          disabled
+        />
 
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          disabled
+        />
 
-          <div className="terms">
-            <label>
-              <input
-                type="checkbox"
-                name="acceptedTerms"
-                checked={formData.acceptedTerms}
-                onChange={handleChange}
-              />
-              I accept the <a href="#">Terms and Conditions</a>
-            </label>
-          </div>
-
-          <button className="email-button" type="submit" disabled={loading}>
-            {loading ? 'Signing up...' : 'Continue with Email'}
-          </button>
-        </form>
-      ) : (
-        <div className="signup-form">
-          <p>A 6-digit verification code was sent to <strong>{emailForVerification}</strong>.</p>
-          <input
-            type="text"
-            placeholder="Enter 6-digit code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            maxLength={6}
-          />
-          <button className="email-button" onClick={handleVerifyCode} disabled={loading}>
-            {loading ? 'Verifying...' : 'Verify Email'}
-          </button>
+        <div className="terms">
+          <label>
+            <input
+              type="checkbox"
+              name="acceptedTerms"
+              checked={formData.acceptedTerms}
+              onChange={handleChange}
+              disabled
+            />
+            I accept the <a href="#">Terms and Conditions</a>
+          </label>
         </div>
-      )}
+
+        <button
+          className="email-button"
+          type="submit"
+          disabled={loading}
+          style={{ cursor: 'not-allowed', opacity: 0.6 }}
+        >
+          Continue with Email (Disabled)
+        </button>
+      </form>
 
       {/* Google Sign-In */}
       <button
         className="google-button shine-hover"
         onClick={() =>
-          (window.location.href = `${import.meta.env.VITE_API_BASE_URL}/login/google`)
+          (window.location.href =
+            'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/login/google')
         }
       >
         <svg
@@ -223,6 +155,5 @@ function Signup() {
 }
 
 export default Signup;
-
 
 
