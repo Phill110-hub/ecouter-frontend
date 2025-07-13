@@ -33,4 +33,9 @@
     background-color: #666;
     cursor: pointer;
 }
+.right-align {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
 
