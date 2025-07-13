@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Signup.css';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -123,6 +123,7 @@ function Signup() {
             value={formData.name}
             onChange={handleChange}
           />
+
           <input
             type="email"
             name="email"
@@ -130,6 +131,7 @@ function Signup() {
             value={formData.email}
             onChange={handleChange}
           />
+
           <input
             type="password"
             name="password"
@@ -137,6 +139,7 @@ function Signup() {
             value={formData.password}
             onChange={handleChange}
           />
+
           <input
             type="password"
             name="confirmPassword"
@@ -185,7 +188,6 @@ function Signup() {
         </div>
       )}
 
-      {/* Google Sign-In */}
       <button
         className="google-button shine-hover"
         onClick={() =>
@@ -234,6 +236,4 @@ function Signup() {
 }
 
 export default Signup;
-
-
 
