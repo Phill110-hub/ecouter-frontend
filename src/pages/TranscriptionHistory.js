@@ -12,13 +12,14 @@ const TranscriptionHistory = () => {
   const [languages, setLanguages] = useState([]);
   const [languageMap, setLanguageMap] = useState({});
   const [showDeleted, setShowDeleted] = useState(false);
+  const [buttonsDisabled, setButtonsDisabled] = useState(true);  // Disable buttons flag
 
   useEffect(() => {
     fetchTranscripts();
   }, [showDeleted]);
 
   const fetchTranscripts = () => {
-    const endpoint = showDeleted ? '/api/transcripts/deleted' : '/api/transcripts';
+    const endpoint = showDeleted ? '/api/deleted_transcripts' : '/api/transcripts';
     fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'GET',
       credentials: 'include'
@@ -144,13 +145,18 @@ const TranscriptionHistory = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>{showDeleted ? "Deleted Transcripts" : "Your Transcribed Files"}</h2>
         <div>
+          {/* Disable the Delete and Show Deleted buttons with "Coming Soon" message */}
           {!showDeleted && transcriptions.length > 0 && (
-            <button onClick={handleDeleteAll} style={{ marginRight: '10px', background: '#aa3333', color: 'white' }}>
-              Delete All
+            <button onClick={handleDeleteAll} style={{ marginRight: '10px', background: '#aa3333', color: 'white' }} disabled={buttonsDisabled}>
+              Coming Soon (Delete All)
             </button>
           )}
-          <button onClick={() => setShowDeleted(!showDeleted)}>
-            {showDeleted ? 'Back to Active' : 'Show Deleted'}
+          <button 
+            onClick={() => setShowDeleted(!showDeleted)} 
+            disabled={buttonsDisabled}
+            style={{ marginRight: '10px', background: '#aa3333', color: 'white' }}
+          >
+            Coming Soon (Show Deleted)
           </button>
         </div>
       </div>
@@ -185,21 +191,22 @@ const TranscriptionHistory = () => {
               <div className="transcription-actions">
                 {!showDeleted ? (
                   <>
-                    <button onClick={() => { setSelectedTranscript(t); setShowModal(true); }}>View Full</button>
-                    <button onClick={() => handleDownload(t.filename, t.text)}>Download</button>
-                    <button onClick={() => handleDelete(t.id)} className="delete-btn">Delete</button>
+                    <button onClick={() => { setSelectedTranscript(t); setShowModal(true); }} disabled={buttonsDisabled}>View Full</button>
+                    <button onClick={() => handleDownload(t.filename, t.text)} disabled={buttonsDisabled}>Download</button>
+                    <button onClick={() => handleDelete(t.id)} className="delete-btn" disabled={buttonsDisabled}>Delete</button>
 
                     <select
                       value={languageMap[t.id] || 'English'}
-                      onChange={(e) => setLanguageMap(prev => ({ ...prev, [t.id]: e.target.value }))}
+                      onChange={(e) => setLanguageMap(prev => ({ ...prev, [t.id]: e.target.value }))} 
                       style={{ marginRight: '5px', marginTop: '8px', width: '160px' }}
+                      disabled={buttonsDisabled}
                     >
                       {languages.map((lang, idx) => (
                         <option key={idx} value={lang}>{lang}</option>
                       ))}
                     </select>
 
-                    <button onClick={() => handleTranslate(t.id)} disabled={translatingId === t.id}>
+                    <button onClick={() => handleTranslate(t.id)} disabled={translatingId === t.id || buttonsDisabled}>
                       {translatingId === t.id ? 'Translating...' : 'Translate'}
                     </button>
 
@@ -209,7 +216,7 @@ const TranscriptionHistory = () => {
                     </audio>
                   </>
                 ) : (
-                  <button onClick={() => handleRestore(t.id)} style={{ background: 'green', color: 'white' }}>
+                  <button onClick={() => handleRestore(t.id)} style={{ background: 'green', color: 'white' }} disabled={buttonsDisabled}>
                     Restore
                   </button>
                 )}
