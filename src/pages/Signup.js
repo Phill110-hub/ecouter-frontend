@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function Signup() {
   const navigate = useNavigate();
+  const backendURL = import.meta.env.VITE_BACKEND_URL || '';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -41,25 +42,30 @@ function Signup() {
     e.preventDefault();
     setLoading(true);
 
+    const newErrors = {};
+
     if (formData.password !== formData.confirmPassword) {
-      setErrors({ confirmPassword: 'Passwords do not match' });
-      setLoading(false);
-      return;
+      newErrors.confirmPassword = 'Passwords do not match';
     }
 
     if (!formData.acceptedTerms) {
-      setErrors({ acceptedTerms: 'You must accept the terms and conditions' });
+      newErrors.acceptedTerms = 'You must accept the terms and conditions';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setSubmitted(true);
       setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch(`${backendURL}/api/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // ✅ Crucial for session cookies
+        credentials: 'include', // ✅ Ensures session cookies are handled
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -68,6 +74,7 @@ function Signup() {
       });
 
       const result = await response.json();
+
       if (response.ok) {
         toast.success('Signup successful! Please check your email to verify.');
         navigate('/login');
@@ -81,6 +88,10 @@ function Signup() {
     }
   };
 
+  const handleGoogleSignup = () => {
+    window.location.href = `${backendURL}/login/google`;
+  };
+
   return (
     <div className="signup-container fade-in">
       <h2 className="signup-title">Join Écouter</h2>
@@ -92,6 +103,7 @@ function Signup() {
           placeholder="Full Name"
           value={formData.name}
           onChange={handleChange}
+          required
         />
 
         <input
@@ -100,6 +112,7 @@ function Signup() {
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
+          required
         />
 
         <input
@@ -108,6 +121,7 @@ function Signup() {
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
+          required
         />
 
         <input
@@ -116,6 +130,7 @@ function Signup() {
           placeholder="Confirm Password"
           value={formData.confirmPassword}
           onChange={handleChange}
+          required
         />
 
         {errors.confirmPassword && (
@@ -130,7 +145,7 @@ function Signup() {
               checked={formData.acceptedTerms}
               onChange={handleChange}
             />
-            I accept the <a href="#">Terms and Conditions</a>
+            I accept the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms and Conditions</a>
           </label>
         </div>
 
@@ -144,13 +159,7 @@ function Signup() {
       </form>
 
       {/* Google Sign-In */}
-      <button
-        className="google-button shine-hover"
-        onClick={() =>
-          (window.location.href =
-            'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/login/google')
-        }
-      >
+      <button className="google-button shine-hover" onClick={handleGoogleSignup}>
         <svg
           className="google-logo"
           xmlns="http://www.w3.org/2000/svg"
