@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import './dashboard.css';
 
-const API_BASE_URL = 'https://your-api-url.com'; // Replace with your actual API base URL
+const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
 
 const TranscriptionHistory = () => {
   const [transcriptions, setTranscriptions] = useState([]);
-  const [showDeleted, setShowDeleted] = useState(false);
   const [selectedTranscript, setSelectedTranscript] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
-  const isDeleteAllDisabled = transcriptions.length === 0 || showDeleted;
+  const [translatedText, setTranslatedText] = useState('');
+  const [translatingId, setTranslatingId] = useState(null);
+  const [languages, setLanguages] = useState([]);
+  const [languageMap, setLanguageMap] = useState({});
+  const [showDeleted, setShowDeleted] = useState(false);
+  const [buttonsDisabled, setButtonsDisabled] = useState(true);
 
   useEffect(() => {
     fetchTranscripts();
@@ -16,13 +20,53 @@ const TranscriptionHistory = () => {
 
   const fetchTranscripts = () => {
     const endpoint = showDeleted ? '/api/deleted_transcripts' : '/api/transcripts';
-    fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'GET',
-      credentials: 'include',
-    })
+    fetch(`${API_BASE_URL}${endpoint}`, { method: 'GET', credentials: 'include' })
       .then(res => res.json())
-      .then(data => setTranscriptions(data))
+      .then(data => {
+        setTranscriptions(data);
+        setButtonsDisabled(false); // Enable buttons after load
+      })
       .catch(err => console.error('Error fetching transcriptions:', err));
+  };
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/translate/languages`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const unique = ['English', ...data.filter(l => l.toLowerCase() !== 'english')];
+          setLanguages([...new Set(unique)].sort());
+        } else {
+          fallbackLanguages();
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load languages:", err);
+        fallbackLanguages();
+      });
+  }, []);
+
+  const fallbackLanguages = () => {
+    setLanguages([
+      "English", "French", "Spanish", "German", "Swahili", "Arabic", "Hindi", "Chinese", "Russian",
+      "Portuguese", "Italian", "Korean", "Japanese", "Turkish", "Dutch", "Polish",
+      "Ukrainian", "Greek", "Hebrew", "Bengali", "Tamil", "Urdu", "Zulu", "Amharic", "Yoruba"
+    ]);
+  };
+
+  const handleDelete = (id) => {
+    if (!window.confirm("Are you sure you want to delete this transcript?")) return;
+
+    fetch(`${API_BASE_URL}/api/transcripts/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    }).then(res => {
+      if (res.ok) {
+        setTranscriptions(transcriptions.filter(t => t.id !== id));
+      } else {
+        alert('Failed to delete transcript.');
+      }
+    });
   };
 
   const handleDeleteAll = () => {
@@ -32,131 +76,147 @@ const TranscriptionHistory = () => {
       transcriptions.map(t =>
         fetch(`${API_BASE_URL}/api/transcripts/${t.id}`, {
           method: 'DELETE',
-          credentials: 'include',
+          credentials: 'include'
         })
       )
-    )
-      .then(() => setTranscriptions([]))
+    ).then(() => {
+      setTranscriptions([]);
+    }).catch(err => {
+      alert("Some transcripts couldn't be deleted.");
+      console.error(err);
+    });
+  };
+
+  const handleRestore = (id) => {
+    fetch(`${API_BASE_URL}/api/transcripts/${id}/restore`, {
+      method: 'POST',
+      credentials: 'include'
+    })
+      .then(res => {
+        if (res.ok) {
+          setTranscriptions(transcriptions.filter(t => t.id !== id));
+        } else {
+          alert('Failed to restore transcript.');
+        }
+      })
       .catch(err => {
-        alert("Some transcripts couldn't be deleted.");
+        alert("Error restoring transcript.");
         console.error(err);
       });
   };
 
   const handleDownload = (filename, text) => {
-    const element = document.createElement("a");
-    const file = new Blob([text], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = filename || "transcript.txt";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    const blob = new Blob([text], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename.replace(/\.[^/.]+$/, "") + '.txt';
+    link.click();
   };
 
-  const handleDelete = (id) => {
-    fetch(`${API_BASE_URL}/api/transcripts/${id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    })
-      .then(() => {
-        setTranscriptions(prev => prev.filter(t => t.id !== id));
-      })
-      .catch(err => console.error("Delete failed:", err));
-  };
+  const handleTranslate = async (id) => {
+    const language = languageMap[id] || 'English';
+    setTranslatingId(id);
+    setTranslatedText('');
 
-  const handleRestore = (id) => {
-    fetch(`${API_BASE_URL}/api/restore_transcript/${id}`, {
-      method: 'POST',
-      credentials: 'include',
-    })
-      .then(() => {
-        setTranscriptions(prev => prev.filter(t => t.id !== id));
-      })
-      .catch(err => console.error("Restore failed:", err));
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/translate/${id}`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.translated_text) {
+        setTranslatedText(data.translated_text);
+        setShowModal(true);
+      } else {
+        alert(data.error || 'Translation failed.');
+      }
+    } catch (err) {
+      console.error('Translate error:', err);
+      alert("Error occurred during translation.");
+    }
+    setTranslatingId(null);
   };
 
   return (
-    <div className="content-area">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ color: 'white' }}>
-          {showDeleted ? "Deleted Transcripts" : "Your Transcribed Files"}
-        </h2>
-        <div>
+    <div className="content-area fade-in">
+      <div className="transcription-header">
+        <h2>{showDeleted ? "Deleted Transcripts" : "Your Transcribed Files"}</h2>
+        <div className="button-group">
+          <div className="coming-soon">Coming Soon</div>
           {!showDeleted && transcriptions.length > 0 && (
-            <button
-              onClick={handleDeleteAll}
-              disabled={isDeleteAllDisabled}
-              style={{
-                marginRight: '10px',
-                background: '#007b83',
-                color: 'white',
-                padding: '8px 14px',
-                borderRadius: '5px',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
+            <button onClick={handleDeleteAll} className="danger-btn" disabled={buttonsDisabled}>
               Delete All
             </button>
           )}
           <button
             onClick={() => setShowDeleted(!showDeleted)}
-            style={{
-              marginRight: '10px',
-              background: '#34495e',
-              color: 'white',
-              padding: '8px 14px',
-              borderRadius: '5px',
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className="danger-btn"
+            disabled={buttonsDisabled}
           >
-            {showDeleted ? "Back to History" : "Show Deleted"}
+            {showDeleted ? "Show Active" : "Show Deleted"}
           </button>
         </div>
       </div>
 
       {transcriptions.length === 0 ? (
-        <p style={{ color: 'white', marginTop: '20px' }}>🎉 Coming Soon</p>
+        <p className="empty-msg">No {showDeleted ? "deleted" : "active"} transcriptions found.</p>
       ) : (
-        <ul className="transcription-list" style={{ marginTop: '20px' }}>
+        <ul className="transcription-list fade-in">
           {transcriptions.map(t => (
-            <li key={t.id} className="transcription-item" style={{
-              background: '#1e1e1e',
-              padding: '15px',
-              marginBottom: '10px',
-              borderRadius: '8px',
-              color: 'white'
-            }}>
+            <li key={t.id} className="transcription-item">
               <strong>{t.filename}</strong>
               <p>{t.text ? t.text.slice(0, 100) + '...' : 'No transcript available.'}</p>
-              <div className="transcription-actions" style={{ marginTop: '10px' }}>
+
+              {t.tags?.length > 0 && (
+                <div className="tag-box">
+                  <strong>Tags:</strong>
+                  <div className="tag-list">
+                    {t.tags.map((tag, index) => (
+                      <span key={index} className="tag-chip">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {t.summary && (
+                <div className="summary-box">
+                  <strong>Summary:</strong>
+                  <p>{t.summary}</p>
+                </div>
+              )}
+
+              <div className="transcription-actions">
                 {!showDeleted ? (
                   <>
-                    <button
-                      onClick={() => { setSelectedTranscript(t); setShowModal(true); }}
-                      style={buttonStyle}
+                    <button onClick={() => { setSelectedTranscript(t); setShowModal(true); }} disabled={buttonsDisabled}>View Full</button>
+                    <button onClick={() => handleDownload(t.filename, t.text)} disabled={buttonsDisabled}>Download</button>
+                    <button onClick={() => handleDelete(t.id)} className="delete-btn" disabled={buttonsDisabled}>Delete</button>
+
+                    <select
+                      value={languageMap[t.id] || 'English'}
+                      onChange={(e) => setLanguageMap(prev => ({ ...prev, [t.id]: e.target.value }))}
+                      className="language-select"
+                      disabled={buttonsDisabled}
                     >
-                      View Full
+                      {languages.map((lang, idx) => (
+                        <option key={idx} value={lang}>{lang}</option>
+                      ))}
+                    </select>
+
+                    <button onClick={() => handleTranslate(t.id)} disabled={translatingId === t.id || buttonsDisabled}>
+                      {translatingId === t.id ? 'Translating...' : 'Translate'}
                     </button>
-                    <button
-                      onClick={() => handleDownload(t.filename, t.text)}
-                      style={buttonStyle}
-                    >
-                      Download
-                    </button>
-                    <button
-                      onClick={() => handleDelete(t.id)}
-                      style={{ ...buttonStyle, background: '#555' }}
-                    >
-                      Delete
-                    </button>
+
+                    <audio controls className="audio-player">
+                      <source src={`${API_BASE_URL}/uploads/${encodeURIComponent(t.filename)}`} />
+                      Your browser does not support the audio element.
+                    </audio>
                   </>
                 ) : (
-                  <button
-                    onClick={() => handleRestore(t.id)}
-                    style={{ ...buttonStyle, background: '#1abc9c' }}
-                  >
+                  <button onClick={() => handleRestore(t.id)} className="restore-btn" disabled={buttonsDisabled}>
                     Restore
                   </button>
                 )}
@@ -166,47 +226,26 @@ const TranscriptionHistory = () => {
         </ul>
       )}
 
-      {showModal && selectedTranscript && (
-        <div className="modal" style={modalStyle}>
-          <div className="modal-content" style={modalContentStyle}>
-            <h3 style={{ color: 'white' }}>{selectedTranscript.filename}</h3>
-            <p style={{ color: 'white', whiteSpace: 'pre-wrap' }}>{selectedTranscript.text}</p>
-            <button onClick={() => setShowModal(false)} style={buttonStyle}>Close</button>
+      {showModal && (
+        <div className="modal-backdrop" onClick={() => setShowModal(false)}>
+          <div className="modal-content slide-up" onClick={e => e.stopPropagation()}>
+            {translatedText ? (
+              <>
+                <h3>Translated Transcript ({languageMap[selectedTranscript?.id] || 'English'})</h3>
+                <pre className="transcript-text">{translatedText}</pre>
+              </>
+            ) : (
+              <>
+                <h3>{selectedTranscript?.filename}</h3>
+                <pre className="transcript-text">{selectedTranscript?.text}</pre>
+              </>
+            )}
+            <button onClick={() => setShowModal(false)} className="close-btn">Close</button>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-const buttonStyle = {
-  background: '#2980b9',
-  color: 'white',
-  padding: '6px 12px',
-  marginRight: '8px',
-  borderRadius: '5px',
-  border: 'none',
-  cursor: 'pointer',
-};
-
-const modalStyle = {
-  position: 'fixed',
-  top: 0, left: 0, right: 0, bottom: 0,
-  backgroundColor: 'rgba(0, 0, 0, 0.75)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 999,
-};
-
-const modalContentStyle = {
-  background: '#2c3e50',
-  padding: '20px',
-  borderRadius: '10px',
-  maxWidth: '600px',
-  width: '90%',
-  maxHeight: '80vh',
-  overflowY: 'auto',
 };
 
 export default TranscriptionHistory;
