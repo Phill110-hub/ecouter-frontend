@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const fetchSession = async () => {
     try {
       console.log('🌍 Using API URL:', API_URL);
-      const res = await axios.get(${API_URL}/api/session, {
+      const res = await axios.get(`${API_URL}/api/session`, {
         withCredentials: true,
       });
       console.log('📡 API session response:', res.data);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLogoutLoading(true);
     try {
-      await axios.post(${API_URL}/logout, {}, { withCredentials: true });
+      await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
     } catch (err) {
       console.error('❌ Logout failed:', err);
     } finally {
