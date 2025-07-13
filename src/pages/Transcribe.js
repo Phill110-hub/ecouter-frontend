@@ -8,6 +8,7 @@ function Transcribe() {
   const [verbatim, setVerbatim] = useState(false);
   const [diarization, setDiarization] = useState(false);
   const [useAISummary, setUseAISummary] = useState(true);
+  const [includeTimestamps, setIncludeTimestamps] = useState(false); // ✅ new state
   const [language, setLanguage] = useState('en');
   const [tags, setTags] = useState('');
   const [projects, setProjects] = useState([]);
@@ -97,6 +98,7 @@ function Transcribe() {
     formData.append('diarization', diarization);
     formData.append('language', language);
     formData.append('use_ai_summary', useAISummary);
+    formData.append('include_timestamps', includeTimestamps); // ✅ send to backend
 
     if (selectedProjectId) {
       formData.append('project_id', selectedProjectId);
@@ -180,6 +182,7 @@ function Transcribe() {
           <label><input type="checkbox" checked={verbatim} onChange={() => setVerbatim(!verbatim)} /> Verbatim</label>
           <label><input type="checkbox" checked={diarization} onChange={() => setDiarization(!diarization)} /> Identify Speakers</label>
           <label><input type="checkbox" checked={useAISummary} onChange={() => setUseAISummary(!useAISummary)} /> Generate AI Summary</label>
+          <label><input type="checkbox" checked={includeTimestamps} onChange={() => setIncludeTimestamps(!includeTimestamps)} /> Include Timestamps</label>
           <label>
             Language:
             <select value={language} onChange={(e) => setLanguage(e.target.value)}>
