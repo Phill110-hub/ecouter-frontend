@@ -11,16 +11,22 @@ const TranscriptionHistory = () => {
   const [translatingId, setTranslatingId] = useState(null);
   const [languages, setLanguages] = useState([]);
   const [languageMap, setLanguageMap] = useState({});
+  const [showDeleted, setShowDeleted] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/transcripts`, {
+    fetchTranscripts();
+  }, [showDeleted]);
+
+  const fetchTranscripts = () => {
+    const endpoint = showDeleted ? '/api/transcripts/deleted' : '/api/transcripts';
+    fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'GET',
       credentials: 'include'
     })
       .then(res => res.json())
       .then(data => setTranscriptions(data))
       .catch(err => console.error('Error fetching transcriptions:', err));
-  }, []);
+  };
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/translate/languages`)
@@ -47,7 +53,7 @@ const TranscriptionHistory = () => {
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this transcript? This cannot be undone.")) return;
+    if (!window.confirm("Are you sure you want to delete this transcript?")) return;
 
     fetch(`${API_BASE_URL}/api/transcripts/${id}`, {
       method: 'DELETE',
@@ -59,6 +65,42 @@ const TranscriptionHistory = () => {
         alert('Failed to delete transcript.');
       }
     });
+  };
+
+  const handleDeleteAll = () => {
+    if (!window.confirm("Delete ALL transcriptions? This cannot be undone!")) return;
+
+    Promise.all(
+      transcriptions.map(t =>
+        fetch(`${API_BASE_URL}/api/transcripts/${t.id}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        })
+      )
+    ).then(() => {
+      setTranscriptions([]);
+    }).catch(err => {
+      alert("Some transcripts couldn't be deleted.");
+      console.error(err);
+    });
+  };
+
+  const handleRestore = (id) => {
+    fetch(`${API_BASE_URL}/api/transcripts/${id}/restore`, {
+      method: 'POST',
+      credentials: 'include'
+    })
+      .then(res => {
+        if (res.ok) {
+          setTranscriptions(transcriptions.filter(t => t.id !== id));
+        } else {
+          alert('Failed to restore transcript.');
+        }
+      })
+      .catch(err => {
+        alert("Error restoring transcript.");
+        console.error(err);
+      });
   };
 
   const handleDownload = (filename, text) => {
@@ -99,9 +141,22 @@ const TranscriptionHistory = () => {
 
   return (
     <div className="content-area">
-      <h2>Your Transcribed Files</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>{showDeleted ? "Deleted Transcripts" : "Your Transcribed Files"}</h2>
+        <div>
+          {!showDeleted && transcriptions.length > 0 && (
+            <button onClick={handleDeleteAll} style={{ marginRight: '10px', background: '#aa3333', color: 'white' }}>
+              Delete All
+            </button>
+          )}
+          <button onClick={() => setShowDeleted(!showDeleted)}>
+            {showDeleted ? 'Back to Active' : 'Show Deleted'}
+          </button>
+        </div>
+      </div>
+
       {transcriptions.length === 0 ? (
-        <p>No transcriptions yet. Upload and transcribe a file!</p>
+        <p>No {showDeleted ? "deleted" : "active"} transcriptions.</p>
       ) : (
         <ul className="transcription-list">
           {transcriptions.map(t => (
@@ -128,36 +183,36 @@ const TranscriptionHistory = () => {
               )}
 
               <div className="transcription-actions">
-                <button onClick={() => { setSelectedTranscript(t); setShowModal(true); }}>View Full</button>
-                <button onClick={() => handleDownload(t.filename, t.text)}>Download</button>
-                <button onClick={() => handleDelete(t.id)} className="delete-btn">Delete</button>
+                {!showDeleted ? (
+                  <>
+                    <button onClick={() => { setSelectedTranscript(t); setShowModal(true); }}>View Full</button>
+                    <button onClick={() => handleDownload(t.filename, t.text)}>Download</button>
+                    <button onClick={() => handleDelete(t.id)} className="delete-btn">Delete</button>
 
-                <select
-                  value={languageMap[t.id] || 'English'}
-                  onChange={(e) => setLanguageMap(prev => ({ ...prev, [t.id]: e.target.value }))}
-                  style={{
-                    marginRight: '5px',
-                    marginTop: '8px',
-                    maxHeight: '150px',
-                    overflowY: 'scroll',
-                    width: '160px'
-                  }}
-                >
-                  {languages.map((lang, idx) => (
-                    <option key={idx} value={lang}>
-                      {lang}
-                    </option>
-                  ))}
-                </select>
+                    <select
+                      value={languageMap[t.id] || 'English'}
+                      onChange={(e) => setLanguageMap(prev => ({ ...prev, [t.id]: e.target.value }))}
+                      style={{ marginRight: '5px', marginTop: '8px', width: '160px' }}
+                    >
+                      {languages.map((lang, idx) => (
+                        <option key={idx} value={lang}>{lang}</option>
+                      ))}
+                    </select>
 
-                <button onClick={() => handleTranslate(t.id)} disabled={translatingId === t.id}>
-                  {translatingId === t.id ? 'Translating...' : 'Translate'}
-                </button>
+                    <button onClick={() => handleTranslate(t.id)} disabled={translatingId === t.id}>
+                      {translatingId === t.id ? 'Translating...' : 'Translate'}
+                    </button>
 
-                <audio controls style={{ marginTop: '10px' }}>
-                  <source src={`${API_BASE_URL}/uploads/${encodeURIComponent(t.filename)}`} />
-                  Your browser does not support the audio element.
-                </audio>
+                    <audio controls style={{ marginTop: '10px' }}>
+                      <source src={`${API_BASE_URL}/uploads/${encodeURIComponent(t.filename)}`} />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </>
+                ) : (
+                  <button onClick={() => handleRestore(t.id)} style={{ background: 'green', color: 'white' }}>
+                    Restore
+                  </button>
+                )}
               </div>
             </li>
           ))}
@@ -170,16 +225,12 @@ const TranscriptionHistory = () => {
             {translatedText ? (
               <>
                 <h3>Translated Transcript ({languageMap[selectedTranscript?.id] || 'English'})</h3>
-                <pre style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                  {translatedText}
-                </pre>
+                <pre style={{ maxHeight: '400px', overflowY: 'auto' }}>{translatedText}</pre>
               </>
             ) : (
               <>
                 <h3>{selectedTranscript?.filename}</h3>
-                <pre style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                  {selectedTranscript?.text}
-                </pre>
+                <pre style={{ maxHeight: '400px', overflowY: 'auto' }}>{selectedTranscript?.text}</pre>
               </>
             )}
             <button onClick={() => setShowModal(false)}>Close</button>
