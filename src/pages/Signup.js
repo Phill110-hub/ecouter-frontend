@@ -3,9 +3,11 @@ import './Signup.css';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAuth } from '../pages/AuthContext'; // ✅ adjust path if needed
 
 function Signup() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ use AuthContext for auto-login
 
   const [formData, setFormData] = useState({
     name: '',
@@ -99,7 +101,8 @@ function Signup() {
 
       if (res.ok) {
         toast.success(data.message);
-        setTimeout(() => navigate('/login'), 2000);
+        login(data.user); // ✅ Set user in context
+        setTimeout(() => navigate('/dashboard'), 1000); // ✅ adjust route as needed
       } else {
         toast.error(data.error || 'Invalid or expired code.');
       }
@@ -236,4 +239,3 @@ function Signup() {
 }
 
 export default Signup;
-
