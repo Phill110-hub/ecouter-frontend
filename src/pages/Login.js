@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from './AuthContext'; // Import useAuth to update context
 
 const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Get the login function from your AuthContext
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -24,8 +26,10 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(`${API_BASE_URL}/api/login`, { email, password }, { withCredentials: true });
-      if (response.status === 200) {
-        navigate('/transcribe');
+      if (response.status === 200 && response.data.user) {
+        login(response.data.user); // Update the auth context with user data
+        // 👇 CORRECTED: Redirect to /dashboard
+        navigate('/dashboard');
       }
     } catch (error) {
       setErrorMsg('Invalid email or password');
@@ -33,9 +37,8 @@ function Login() {
   };
 
   return (
-    // Note: For this container to be centered, see the CSS changes below.
-    <div className="login-container fade-in">
-      <h2 className="login-title">Welcome Back to Écouter</h2>
+    <div className="login-container">
+      <h2 className="login-title">Welcome Back to Ecouter</h2>
 
       <form onSubmit={handleEmailLogin} className="login-form">
         <input
@@ -57,15 +60,10 @@ function Login() {
 
         {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
-        {/* --- BUTTONS REORDERED AS REQUESTED --- */}
-
-        {/* 1. "Login with Email" button is now first */}
         <button type="submit" className="email-button">
           Login with Email
         </button>
 
-        {/* 2. "Forgot Password" button is second */}
-        {/* UPDATED: Changed className for proper styling */}
         <button type="button" className="forgot-password-button" onClick={handleForgotPassword}>
           Forgot Password?
         </button>
@@ -83,7 +81,6 @@ function Login() {
         <span>Continue with Google</span>
       </button>
 
-      {/* UPDATED: Cleaned up inline styles by using a class */}
       <p className="signup-link">
         Don’t have an account?{' '}
         <button className="link-button" onClick={() => navigate('/signup')}>
