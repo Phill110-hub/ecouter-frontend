@@ -8,7 +8,7 @@ function Transcribe() {
   const [verbatim, setVerbatim] = useState(false);
   const [diarization, setDiarization] = useState(false);
   const [useAISummary, setUseAISummary] = useState(true);
-  const [includeTimestamps, setIncludeTimestamps] = useState(false); // ✅ new state
+  const [includeTimestamps, setIncludeTimestamps] = useState(false);
   const [language, setLanguage] = useState('en');
   const [tags, setTags] = useState('');
   const [projects, setProjects] = useState([]);
@@ -24,6 +24,9 @@ function Transcribe() {
   const [processingTranscriptId, setProcessingTranscriptId] = useState(localStorage.getItem('processingId'));
 
   const audioRef = useRef(null);
+  const transcriptRef = useRef(null);
+  const scrollButtonRef = useRef(null);
+  const [highlightTranscript, setHighlightTranscript] = useState(false);
 
   const languageOptions = [
     { code: 'en', name: 'English' }, { code: 'fr', name: 'French' }, { code: 'es', name: 'Spanish' },
@@ -46,9 +49,7 @@ function Transcribe() {
 
   const pollTranscriptStatus = async (id) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/transcripts/${id}`, {
-        credentials: 'include',
-      });
+      const res = await fetch(`${API_BASE_URL}/api/transcripts/${id}`, { credentials: 'include' });
       const data = await res.json();
 
       if (data.status === 'complete') {
@@ -73,6 +74,13 @@ function Transcribe() {
         localStorage.setItem('wordList', JSON.stringify(allWords));
         localStorage.removeItem('processingId');
         setProcessingTranscriptId(null);
+
+        setTimeout(() => {
+          transcriptRef.current?.scrollIntoView({ behavior: 'smooth' });
+          setHighlightTranscript(true);
+          setTimeout(() => setHighlightTranscript(false), 3000);
+          audioRef.current?.play().catch(() => {});
+        }, 500);
       } else {
         setTimeout(() => pollTranscriptStatus(id), 5000);
       }
@@ -98,12 +106,8 @@ function Transcribe() {
     formData.append('diarization', diarization);
     formData.append('language', language);
     formData.append('use_ai_summary', useAISummary);
-    formData.append('include_timestamps', includeTimestamps); // ✅ send to backend
-
-    if (selectedProjectId) {
-      formData.append('project_id', selectedProjectId);
-    }
-
+    formData.append('include_timestamps', includeTimestamps);
+    if (selectedProjectId) formData.append('project_id', selectedProjectId);
     formData.append('tags', tags);
 
     try {
@@ -129,6 +133,13 @@ function Transcribe() {
         localStorage.setItem('topic', data.topic || '');
         localStorage.setItem('audioUrl', data.audio_url);
         localStorage.setItem('wordList', JSON.stringify(allWords));
+
+        setTimeout(() => {
+          transcriptRef.current?.scrollIntoView({ behavior: 'smooth' });
+          setHighlightTranscript(true);
+          setTimeout(() => setHighlightTranscript(false), 3000);
+          audioRef.current?.play().catch(() => {});
+        }, 500);
       } else {
         alert(data.error || 'Transcription failed.');
       }
@@ -221,24 +232,43 @@ function Transcribe() {
       )}
 
       {transcript && (
-        <div className="transcript-output">
-          <h3>Transcript:</h3>
-          {isWordLevel ? (
-            <div className="word-highlighting">
-              {wordList.map((word, index) => (
-                <span key={index} className={index === activeWordIndex ? 'highlight' : ''}>
-                  {(word.word || word.text || '[?]') + ' '}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <div className="paragraph-format">
-              {transcript.split('\n\n').map((para, i) => (
-                <p key={i}>{para}</p>
-              ))}
-            </div>
-          )}
-        </div>
+        <>
+          <button
+            ref={scrollButtonRef}
+            onClick={() => transcriptRef.current?.scrollIntoView({ behavior: 'smooth' })}
+            style={{
+              marginTop: '20px',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              background: '#ffffff10',
+              color: 'white',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+            }}
+          >
+            📜 Scroll to Transcript
+          </button>
+
+          <div className={`transcript-output ${highlightTranscript ? 'highlight-flash' : ''}`} ref={transcriptRef}>
+            <h3>Transcript:</h3>
+            {isWordLevel ? (
+              <div className="word-highlighting">
+                {wordList.map((word, index) => (
+                  <span key={index} className={index === activeWordIndex ? 'highlight' : ''}>
+                    {(word.word || word.text || '[?]') + ' '}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div className="paragraph-format">
+                {transcript.split('\n\n').map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {(summary || topic) && (
@@ -262,3 +292,4 @@ function Transcribe() {
 }
 
 export default Transcribe;
+
