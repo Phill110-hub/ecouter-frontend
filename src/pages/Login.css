@@ -1,28 +1,27 @@
 /*
-  IMPORTANT: Add this to your main CSS file (like index.css or App.css)
-  to center the container on the page. This targets the main div of your
-  React app.
+  NEW: Wrapper to center the login page content.
+  In your Login.js, wrap the entire component return in: <div className="login-page-wrapper"> ... </div>
 */
-#root {
+.login-page-wrapper {
   display: flex;
-  justify-content: center; /* Horizontal centering */
-  align-items: center;   /* Vertical centering */
-  min-height: 100vh;     /* Full screen height */
-  background-color: #121212; /* Your app's dark background */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #121212; /* Or your desired page background */
 }
 
-
-/* --- Container and General Styles (in Login.css) --- */
+/* --- Container and General Styles --- */
 
 .login-container {
   max-width: 380px;
-  /* REMOVED: `margin: 5rem auto;` This is now handled by #root for perfect centering. */
+  width: 100%; /* Ensures it's responsive on smaller screens */
   background-color: #1a1a1a;
   padding: 2.5rem;
   border-radius: 12px;
   color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  width: 100%; /* Ensures the container has a defined width */
+  /* The margin is no longer needed for centering */
 }
 
 .login-title {
@@ -32,15 +31,13 @@
   font-weight: 600;
 }
 
-
 /* --- Form Container --- */
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem; /* Adjusts space between form elements */
+  gap: 1.1rem;
 }
-
 
 /* --- Form Elements (Inputs & Buttons) --- */
 
@@ -69,9 +66,9 @@
   background-color: #0056b3;
 }
 
-/* NEW: Style for the "Forgot Password" button */
+/* "Forgot Password" button */
 .forgot-password-button {
-  background-color: #2d2d2d; /* Dark grey background */
+  background-color: #2d2d2d;
   color: #ccc;
   border: 1px solid #444;
   font-weight: 500;
@@ -110,7 +107,6 @@
   margin-right: 12px;
 }
 
-
 /* --- Separator and Links --- */
 
 .separator {
@@ -136,7 +132,6 @@
   margin-left: 0.5em;
 }
 
-/* UPDATED: Renamed from .login-link for clarity */
 .signup-link {
   text-align: center;
   margin-top: 1.5rem;
@@ -144,7 +139,6 @@
   font-size: 14px;
 }
 
-/* NEW: Class for the "Go to Sign Up" link-style button */
 .link-button {
   background: none;
   border: none;
@@ -152,10 +146,8 @@
   text-decoration: underline;
   cursor: pointer;
   font-size: 14px;
-  padding: 0;
-  font-family: inherit; /* Ensures it uses the same font */
+  font-family: inherit;
 }
-
 
 /* --- Other Styles --- */
 
@@ -167,6 +159,5 @@
   border-radius: 8px;
   text-align: center;
   font-size: 0.9rem;
-  /* Ensure the error message is ordered correctly by the flex container */
-  order: -1; /* This moves the error message before the buttons */
+  order: -1; /* Puts the error message before the buttons */
 }
