@@ -1,6 +1,6 @@
 /*
-  NEW: Wrapper to center the login page content.
-  In your Login.js, wrap the entire component return in: <div className="login-page-wrapper"> ... </div>
+  This wrapper is the key to centering the page.
+  It creates a full-screen container that is ONLY active on the login page.
 */
 .login-page-wrapper {
   display: flex;
@@ -8,20 +8,20 @@
   align-items: center;
   width: 100%;
   min-height: 100vh;
-  background-color: #121212; /* Or your desired page background */
+  background-color: #121212; /* This sets the dark background for the page */
 }
 
-/* --- Container and General Styles --- */
+/* --- Login Box Styles --- */
 
 .login-container {
   max-width: 380px;
-  width: 100%; /* Ensures it's responsive on smaller screens */
+  width: 100%;
   background-color: #1a1a1a;
   padding: 2.5rem;
   border-radius: 12px;
   color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  /* The margin is no longer needed for centering */
+  /* No margin needed for centering anymore */
 }
 
 .login-title {
@@ -31,15 +31,13 @@
   font-weight: 600;
 }
 
-/* --- Form Container --- */
+/* --- Form Styles --- */
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1.1rem; /* Space between inputs and buttons */
 }
-
-/* --- Form Elements (Inputs & Buttons) --- */
 
 .login-form input {
   background: #1c1c1c;
@@ -50,9 +48,11 @@
   font-size: 1rem;
 }
 
+/* --- Button and Link Styles --- */
+
 /* Primary "Login with Email" button */
 .email-button {
-  background: #007bff;
+  background: #007bff; /* Using a more distinct color */
   color: white;
   font-weight: bold;
   border: none;
@@ -60,26 +60,30 @@
   padding: 14px;
   border-radius: 8px;
   transition: background-color 0.3s ease;
+  order: 1; /* Ensures it comes after the forgot password link */
 }
 
 .email-button:hover {
   background-color: #0056b3;
 }
 
-/* "Forgot Password" button */
-.forgot-password-button {
-  background-color: #2d2d2d;
-  color: #ccc;
-  border: 1px solid #444;
-  font-weight: 500;
+/* NEW: "Forgot Password" as a subtle link */
+.forgot-password-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #aaa; /* Subtle grey color */
+  font-size: 0.85rem;
+  text-decoration: none;
+  align-self: flex-end; /* Pushes it to the right */
   cursor: pointer;
-  padding: 14px;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
+  transition: color 0.2s ease-in-out;
+  margin-top: -8px; /* Pulls it closer to the password input */
 }
 
-.forgot-password-button:hover {
-  background-color: #3a3a3a;
+.forgot-password-link:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 
 /* Google Button */
@@ -97,24 +101,14 @@
   transition: opacity 0.3s ease;
 }
 
-.google-button:hover {
-  opacity: 0.9;
-}
-
-.google-logo {
-  width: 20px;
-  height: 20px;
-  margin-right: 12px;
-}
-
-/* --- Separator and Links --- */
+/* --- Other Elements --- */
 
 .separator {
   display: flex;
   align-items: center;
   text-align: center;
   color: #888;
-  margin: 0.25rem 0;
+  margin: 0.5rem 0;
 }
 
 .separator::before,
@@ -142,22 +136,9 @@
 .link-button {
   background: none;
   border: none;
-  color: #4fa3ff;
+  color: #4fa3ff; /* Blue color for the sign-up link */
   text-decoration: underline;
   cursor: pointer;
-  font-size: 14px;
-  font-family: inherit;
-}
-
-/* --- Other Styles --- */
-
-.error-message {
-  color: #ff4d4d;
-  background-color: rgba(255, 77, 77, 0.1);
-  border: 1px solid #ff4d4d;
-  padding: 10px;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 0.9rem;
-  order: -1; /* Puts the error message before the buttons */
+  font-size: inherit;
+  padding: 0;
 }
