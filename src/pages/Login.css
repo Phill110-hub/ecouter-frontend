@@ -1,13 +1,28 @@
-/* --- Container and General Styles --- */
+/*
+  IMPORTANT: Add this to your main CSS file (like index.css or App.css)
+  to center the container on the page. This targets the main div of your
+  React app.
+*/
+#root {
+  display: flex;
+  justify-content: center; /* Horizontal centering */
+  align-items: center;   /* Vertical centering */
+  min-height: 100vh;     /* Full screen height */
+  background-color: #121212; /* Your app's dark background */
+}
+
+
+/* --- Container and General Styles (in Login.css) --- */
 
 .login-container {
-  max-width: 380px; /* CHANGED: Reduced from 400px to make it less dominant */
-  margin: 5rem auto;
+  max-width: 380px;
+  /* REMOVED: `margin: 5rem auto;` This is now handled by #root for perfect centering. */
   background-color: #1a1a1a;
   padding: 2.5rem;
   border-radius: 12px;
   color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  width: 100%; /* Ensures the container has a defined width */
 }
 
 .login-title {
@@ -17,36 +32,36 @@
   font-weight: 600;
 }
 
+
 /* --- Form Container --- */
+
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem; /* Slightly adjusted gap */
+  gap: 1.1rem; /* Adjusts space between form elements */
 }
 
 
 /* --- Form Elements (Inputs & Buttons) --- */
 
-.login-form input,
-.email-button,
-.google-button {
+.login-form input {
+  background: #1c1c1c;
+  color: white;
   padding: 14px;
   border-radius: 8px;
   border: 1px solid #333;
   font-size: 1rem;
 }
 
-.login-form input {
-  background: #1c1c1c;
-  color: white;
-}
-
+/* Primary "Login with Email" button */
 .email-button {
   background: #007bff;
   color: white;
   font-weight: bold;
   border: none;
   cursor: pointer;
+  padding: 14px;
+  border-radius: 8px;
   transition: background-color 0.3s ease;
 }
 
@@ -54,6 +69,23 @@
   background-color: #0056b3;
 }
 
+/* NEW: Style for the "Forgot Password" button */
+.forgot-password-button {
+  background-color: #2d2d2d; /* Dark grey background */
+  color: #ccc;
+  border: 1px solid #444;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 14px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.forgot-password-button:hover {
+  background-color: #3a3a3a;
+}
+
+/* Google Button */
 .google-button {
   display: flex;
   align-items: center;
@@ -63,6 +95,8 @@
   font-weight: bold;
   border: none;
   cursor: pointer;
+  padding: 14px;
+  border-radius: 8px;
   transition: opacity 0.3s ease;
 }
 
@@ -79,48 +113,47 @@
 
 /* --- Separator and Links --- */
 
-/* NEW & IMPROVED: This creates lines on either side of "OR" */
 .separator {
   display: flex;
-  align-items: center; /* Vertically center the text with the lines */
+  align-items: center;
   text-align: center;
   color: #888;
-  margin: 0.25rem 0; /* Adjusted margin */
+  margin: 0.25rem 0;
 }
 
-/* This creates the line on the left */
 .separator::before,
-/* This creates the line on the right */
 .separator::after {
   content: '';
-  flex: 1; /* This makes the lines take up all available space */
-  border-bottom: 1px solid #444; /* Line color */
+  flex: 1;
+  border-bottom: 1px solid #444;
 }
 
-/* Adds space between the left line and the text */
 .separator:not(:empty)::before {
   margin-right: 0.5em;
 }
 
-/* Adds space between the text and the right line */
 .separator:not(:empty)::after {
   margin-left: 0.5em;
 }
 
-
-.login-link {
+/* UPDATED: Renamed from .login-link for clarity */
+.signup-link {
   text-align: center;
   margin-top: 1.5rem;
+  color: #888;
+  font-size: 14px;
 }
 
-.login-link a {
+/* NEW: Class for the "Go to Sign Up" link-style button */
+.link-button {
+  background: none;
+  border: none;
   color: #4fa3ff;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.login-link a:hover {
   text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  font-family: inherit; /* Ensures it uses the same font */
 }
 
 
@@ -131,24 +164,9 @@
   background-color: rgba(255, 77, 77, 0.1);
   border: 1px solid #ff4d4d;
   padding: 10px;
-  
-/* --- Add this new class to your CSS file --- */
-
-.forgot-password-link {
-  align-self: flex-end; /* Pushes the link to the right */
-  color: #aaa;
-  font-size: 0.85rem;
-  text-decoration: none;
-  background: none; /* Make it look like a link, not a button */
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-top: -8px;
-  margin-bottom: 8px;
-  transition: color 0.3s ease;
-}
-
-.forgot-password-link:hover {
-  color: #fff;
-  text-decoration: underline;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  /* Ensure the error message is ordered correctly by the flex container */
+  order: -1; /* This moves the error message before the buttons */
 }
