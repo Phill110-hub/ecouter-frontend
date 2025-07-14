@@ -1,27 +1,27 @@
 /*
-  This wrapper is the key to centering the page.
-  It creates a full-screen container that is ONLY active on the login page.
+  The body of your page should have a dark background.
+  If the background isn't dark, you can add this to your main index.css:
+  body { background-color: #121212; }
 */
-.login-page-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 100vh;
-  background-color: #121212; /* This sets the dark background for the page */
-}
 
-/* --- Login Box Styles --- */
-
+/* --- The Centered Login Box --- */
 .login-container {
-  max-width: 380px;
-  width: 100%;
+  /* This is the new "medium" size */
+  max-width: 420px;
+  width: calc(100% - 2rem); /* Ensures padding on small screens */
+
+  /* NEW: Absolute centering method */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* --- Standard Styles --- */
   background-color: #1a1a1a;
   padding: 2.5rem;
   border-radius: 12px;
   color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  /* No margin needed for centering anymore */
 }
 
 .login-title {
@@ -32,11 +32,10 @@
 }
 
 /* --- Form Styles --- */
-
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem; /* Space between inputs and buttons */
+  gap: 1.25rem; /* A little more space for this button layout */
 }
 
 .login-form input {
@@ -48,57 +47,38 @@
   font-size: 1rem;
 }
 
-/* --- Button and Link Styles --- */
+/* --- Button Styles --- */
 
 /* Primary "Login with Email" button */
 .email-button {
-  background: #007bff; /* Using a more distinct color */
+  background: #000; /* Black button as in the screenshot */
   color: white;
   font-weight: bold;
-  border: none;
+  border: 1px solid #444;
   cursor: pointer;
   padding: 14px;
   border-radius: 8px;
   transition: background-color 0.3s ease;
-  order: 1; /* Ensures it comes after the forgot password link */
 }
 
 .email-button:hover {
-  background-color: #0056b3;
+  background-color: #111;
 }
 
-/* NEW: "Forgot Password" as a subtle link */
-.forgot-password-link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: #aaa; /* Subtle grey color */
-  font-size: 0.85rem;
-  text-decoration: none;
-  align-self: flex-end; /* Pushes it to the right */
-  cursor: pointer;
-  transition: color 0.2s ease-in-out;
-  margin-top: -8px; /* Pulls it closer to the password input */
-}
-
-.forgot-password-link:hover {
-  color: #fff;
-  text-decoration: underline;
-}
-
-/* Google Button */
-.google-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  color: #1c1c1c;
-  font-weight: bold;
-  border: none;
+/* "Forgot Password" button */
+.forgot-password-button {
+  background-color: #2d2d2d;
+  color: #ccc;
+  border: 1px solid #444;
+  font-weight: 500;
   cursor: pointer;
   padding: 14px;
   border-radius: 8px;
-  transition: opacity 0.3s ease;
+  transition: background-color 0.3s ease;
+}
+
+.forgot-password-button:hover {
+  background-color: #3a3a3a;
 }
 
 /* --- Other Elements --- */
@@ -136,7 +116,7 @@
 .link-button {
   background: none;
   border: none;
-  color: #4fa3ff; /* Blue color for the sign-up link */
+  color: #4fa3ff;
   text-decoration: underline;
   cursor: pointer;
   font-size: inherit;
