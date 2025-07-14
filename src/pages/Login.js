@@ -16,9 +16,8 @@ function Login() {
     window.location.href = `${API_BASE_URL}/login/google`;
   };
 
-  // NEW: Handler for the forgot password link
   const handleForgotPassword = () => {
-    navigate('/forgot-password'); // This will take the user to the forgot password page
+    navigate('/forgot-password');
   };
 
   const handleEmailLogin = async (e) => {
@@ -26,7 +25,7 @@ function Login() {
     try {
       const response = await axios.post(`${API_BASE_URL}/api/login`, { email, password }, { withCredentials: true });
       if (response.status === 200) {
-        navigate('/transcribe'); // redirect after login
+        navigate('/transcribe');
       }
     } catch (error) {
       setErrorMsg('Invalid email or password');
@@ -34,6 +33,7 @@ function Login() {
   };
 
   return (
+    // Note: For this container to be centered, see the CSS changes below.
     <div className="login-container fade-in">
       <h2 className="login-title">Welcome Back to Écouter</h2>
 
@@ -55,20 +55,22 @@ function Login() {
           className="login-input"
         />
 
-        {/* NEW: Forgot Password Button */}
-        {/* It uses the CSS class from our previous conversation */}
-        <button type="button" className="forgot-password-link" onClick={handleForgotPassword}>
-          Forgot Password?
-        </button>
-
         {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
-        <button type="submit" className="login-button">
+        {/* --- BUTTONS REORDERED AS REQUESTED --- */}
+
+        {/* 1. "Login with Email" button is now first */}
+        <button type="submit" className="email-button">
           Login with Email
+        </button>
+
+        {/* 2. "Forgot Password" button is second */}
+        {/* UPDATED: Changed className for proper styling */}
+        <button type="button" className="forgot-password-button" onClick={handleForgotPassword}>
+          Forgot Password?
         </button>
       </form>
 
-      {/* UPDATED: Changed class name to match CSS from previous step */}
       <div className="separator">OR</div>
 
       <button className="google-button" onClick={handleGoogleLogin}>
@@ -81,20 +83,10 @@ function Login() {
         <span>Continue with Google</span>
       </button>
 
-      <p style={{ marginTop: '1.5rem', color: '#888', fontSize: '14px' }}>
+      {/* UPDATED: Cleaned up inline styles by using a class */}
+      <p className="signup-link">
         Don’t have an account?{' '}
-        <button
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#2196f3',
-            textDecoration: 'underline',
-            cursor: 'pointer',
-            fontSize: '14px',
-            padding: 0
-          }}
-          onClick={() => navigate('/signup')}
-        >
+        <button className="link-button" onClick={() => navigate('/signup')}>
           Go to Sign Up
         </button>
       </p>
