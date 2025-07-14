@@ -16,6 +16,9 @@ import Home from './pages/Home';
 import TranscriptDetail from './pages/TranscriptDetail';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+// NEW: Import the password reset pages
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 import { useAuth } from './pages/AuthContext';
 import SupportChat from './pages/SupportChat';
@@ -25,7 +28,6 @@ import './App.css';
 function App() {
   const { isAuthenticated, loading } = useAuth();
 
-  // ✅ Show splash/loading screen until session is confirmed
   if (loading) {
     return (
       <div className="loading-screen">
@@ -43,6 +45,17 @@ function App() {
           <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Home />} />
           <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
+          
+          {/* --- NEW: PASSWORD RESET ROUTES --- */}
+          <Route
+            path="/forgot-password"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPassword />}
+          />
+          <Route
+            path="/reset-password/:token"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <ResetPassword />}
+          />
+
           <Route path="/welcome" element={<WelcomePage />} />
           <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
           <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
