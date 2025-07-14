@@ -1,16 +1,10 @@
-/*
-  The body of your page should have a dark background.
-  If the background isn't dark, you can add this to your main index.css:
-  body { background-color: #121212; }
-*/
-
 /* --- The Centered Login Box --- */
 .login-container {
-  /* This is the new "medium" size */
+  /* This is the "medium" size */
   max-width: 420px;
   width: calc(100% - 2rem); /* Ensures padding on small screens */
 
-  /* NEW: Absolute centering method */
+  /* Absolute centering method */
   position: absolute;
   top: 50%;
   left: 50%;
@@ -51,7 +45,7 @@
 
 /* Primary "Login with Email" button */
 .email-button {
-  background: #000; /* Black button as in the screenshot */
+  background: #000;
   color: white;
   font-weight: bold;
   border: 1px solid #444;
