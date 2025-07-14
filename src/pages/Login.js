@@ -1,22 +1,63 @@
 // src/pages/Login.js
-import React from 'react';
+import React, { useState } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+const API_BASE_URL = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev';
 
 function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://5914e34b-5374-4c2b-ac7f-284078e07b90-00-25n0w53arrsx8.janeway.replit.dev/login/google';
+    window.location.href = `${API_BASE_URL}/login/google`;
+  };
+
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/login`, { email, password }, { withCredentials: true });
+      if (response.status === 200) {
+        navigate('/transcribe'); // redirect after login
+      }
+    } catch (error) {
+      setErrorMsg('Invalid email or password');
+    }
   };
 
   return (
     <div className="login-container fade-in">
       <h2 className="login-title">Welcome Back to Écouter</h2>
 
-      <p style={{ textAlign: 'center', marginBottom: '1rem', color: '#555' }}>
-        Login is only available via Google.
-      </p>
+      <form onSubmit={handleEmailLogin} className="login-form">
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="login-input"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="login-input"
+        />
+
+        {errorMsg && <p className="error-msg">{errorMsg}</p>}
+
+        <button type="submit" className="login-button">
+          Login with Email
+        </button>
+      </form>
+
+      <div className="divider">OR</div>
 
       <button className="google-button" onClick={handleGoogleLogin}>
         <svg className="google-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -50,3 +91,4 @@ function Login() {
 }
 
 export default Login;
+
