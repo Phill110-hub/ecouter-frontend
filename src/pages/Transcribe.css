@@ -1,14 +1,19 @@
 .transcribe-container {
-  padding: 30px;
+  padding: 10px 30px 30px 30px; /* 🔽 Reduced top padding */
   color: white;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   max-width: 900px;
   margin: 0 auto;
 }
 
+.transcribe-container h2 {
+  margin-top: 0;         /* 🔽 Remove top margin from heading */
+  margin-bottom: 15px;   /* Optional: reduce spacing below */
+}
+
 /* Main form container */
 .transcribe-box {
-  margin-top: 20px;
+  margin-top: 10px; /* 🔽 Reduced margin to pull up the form */
   background-color: #121212;
   padding: 30px;
   border-radius: 10px;
