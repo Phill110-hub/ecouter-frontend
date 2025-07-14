@@ -1,94 +1,62 @@
-/* === Base Layout === */
-html, body {
+body, html {
   height: 100%;
   margin: 0;
   padding: 0;
   background: #121212;
   font-family: 'Segoe UI', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-/* === Container === */
 .verify-container {
-  max-width: 420px;       /* ⬅️ Increased from 360px */
-  width: 90%;
-  padding: 2rem;          /* ⬅️ More padding */
+  max-width: 400px;
+  margin: auto;
+  padding: 2rem;
   background: #1e1e1e;
   color: #fff;
   border-radius: 10px;
   text-align: center;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
 }
 
-/* === Heading and Text === */
 .verify-container h2 {
   margin-bottom: 10px;
   font-size: 1.8rem;
 }
 
 .verify-container p {
-  font-size: 1rem;
-  margin-bottom: 6px;
-  line-height: 1.4;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
 }
 
-.verify-container b {
-  display: block;
-  margin-bottom: 1.2rem;
-  color: #fff;
-  word-wrap: break-word;
-}
-
-/* === Code Input === */
 .code-input {
   width: 100%;
   padding: 12px;
   font-size: 18px;
-  margin-bottom: 16px;    /* ⬅️ Increased space below input */
+  margin: 10px 0;
   border-radius: 5px;
   border: 1px solid #333;
   background: #2a2a2a;
   color: #fff;
-  text-align: center;
-  letter-spacing: 2px;
 }
 
-/* === Buttons === */
-.verify-btn {
-  background: #000;
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s ease;
-  width: 100%;
-  margin-bottom: 10px;   /* ⬅️ Space between buttons if stacked */
-}
-
-.verify-btn:hover {
-  background: #333;
-}
-
+.verify-btn,
 .resend-btn {
   background: #000;
   color: white;
-  padding: 12px;
+  padding: 10px 15px;
+  margin: 10px 5px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
   transition: background 0.3s ease;
-  width: 100%;
 }
 
+.verify-btn:hover,
 .resend-btn:hover {
   background: #333;
 }
@@ -98,7 +66,6 @@ html, body {
   cursor: not-allowed;
 }
 
-/* === Feedback Text === */
 .error-text {
   color: #ff4f4f;
   font-size: 0.85rem;
@@ -115,26 +82,4 @@ html, body {
   font-size: 0.75rem;
   color: #aaa;
   margin-top: 6px;
-}
-
-/* === Responsive Adjustments === */
-@media (max-width: 400px) {
-  .verify-container {
-    padding: 1.5rem;
-  }
-
-  .verify-container h2 {
-    font-size: 1.5rem;
-  }
-
-  .code-input {
-    font-size: 16px;
-    padding: 10px;
-  }
-
-  .verify-btn,
-  .resend-btn {
-    font-size: 0.95rem;
-    padding: 10px;
-  }
 }
