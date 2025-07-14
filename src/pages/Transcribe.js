@@ -52,6 +52,13 @@ function Transcribe() {
       const res = await fetch(`${API_BASE_URL}/api/transcripts/${id}`, { credentials: 'include' });
       const data = await res.json();
 
+      if (res.status === 404 || data.error) {
+        console.warn("❌ Transcript not found or errored.");
+        localStorage.removeItem('processingId');
+        setProcessingTranscriptId(null);
+        return;
+      }
+
       if (data.status === 'complete') {
         setTranscript(data.text);
         setSummary(data.summary || '');
@@ -86,6 +93,8 @@ function Transcribe() {
       }
     } catch (error) {
       console.error('Polling error:', error);
+      localStorage.removeItem('processingId');
+      setProcessingTranscriptId(null);
     }
   };
 
@@ -134,6 +143,11 @@ function Transcribe() {
         localStorage.setItem('audioUrl', data.audio_url);
         localStorage.setItem('wordList', JSON.stringify(allWords));
 
+        if (data.id) {
+          localStorage.setItem('processingId', data.id);
+          setProcessingTranscriptId(data.id);
+        }
+
         setTimeout(() => {
           transcriptRef.current?.scrollIntoView({ behavior: 'smooth' });
           setHighlightTranscript(true);
@@ -173,7 +187,13 @@ function Transcribe() {
 
   useEffect(() => {
     if (processingTranscriptId) {
-      pollTranscriptStatus(processingTranscriptId);
+      const confirmResume = window.confirm("Resume last unfinished transcription?");
+      if (confirmResume) {
+        pollTranscriptStatus(processingTranscriptId);
+      } else {
+        localStorage.removeItem('processingId');
+        setProcessingTranscriptId(null);
+      }
     }
   }, []);
 
@@ -292,4 +312,3 @@ function Transcribe() {
 }
 
 export default Transcribe;
-
