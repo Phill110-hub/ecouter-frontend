@@ -10,13 +10,17 @@ import {
   FaSignOutAlt,
   FaBars,
 } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Using axios for cleaner requests
 
+// Import your page components
 import Profile from './Profile';
 import Transcribe from './Transcribe';
 import TranscriptionHistory from './TranscriptionHistory';
 import Projects from './Projects';
 import Tags from './tags';
-import { useNavigate } from 'react-router-dom';
+// NEW: Import the empty state component we'll create
+import EmptyDashboard from './EmptyDashboard';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -24,9 +28,12 @@ function Dashboard() {
   const [activeComponent, setActiveComponent] = useState('transcribe');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userData, setUserData] = useState(null);
+  // NEW: State to hold the list of transcripts
+  const [transcripts, setTranscripts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // This function can remain as is
   const handleLogout = async () => {
     try {
       const response = await fetch(`${API_URL}/logout`, {
@@ -47,42 +54,44 @@ function Dashboard() {
     }
   };
 
-  const fetchDashboardData = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/profile`, {
-        method: 'GET',
-        credentials: 'include',
-      });
-
-      if (res.status === 401) {
-        navigate('/login');
-        return;
-      }
-
-      const data = await res.json();
-      setUserData({ user: data });
-    } catch (err) {
-      console.error('Failed to load dashboard:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // UPDATED: Fetch all necessary data when the dashboard loads
   useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        // Fetch profile and transcripts data at the same time for efficiency
+        const [profileRes, transcriptsRes] = await Promise.all([
+          axios.get(`${API_URL}/api/profile`, { withCredentials: true }),
+          axios.get(`${API_URL}/api/transcripts`, { withCredentials: true })
+        ]);
+
+        setUserData({ user: profileRes.data });
+        setTranscripts(transcriptsRes.data);
+
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+        // If unauthorized, redirect to login
+        if (err.response && err.response.status === 401) {
+          navigate('/login');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchDashboardData();
-  }, []);
+  }, [navigate]); // Dependency array includes navigate
 
   const renderContent = () => {
-    if (loading) return <div className="loading">Loading...</div>;
-    if (!userData) return <div className="error">Failed to load user data.</div>;
-
+    // This function now just decides which main component to show
     switch (activeComponent) {
       case 'profile':
         return <Profile user={userData.user || {}} />;
       case 'transcribe':
         return <Transcribe />;
       case 'history':
-        return <TranscriptionHistory transcripts={userData.transcripts || []} />;
+        // Pass the fetched transcripts to the history component
+        return <TranscriptionHistory transcripts={transcripts} />;
       case 'projects':
         return <Projects />;
       case 'tags':
@@ -92,8 +101,10 @@ function Dashboard() {
     }
   };
 
+  // The main return logic is now updated to handle the empty state
   return (
     <div className="dashboard-container">
+      {/* Sidebar remains the same */}
       <div className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
         <div className="sidebar-header">
           {sidebarOpen && <h3>Dashboard</h3>}
@@ -134,7 +145,17 @@ function Dashboard() {
       </div>
 
       <div className="main-content">
-        <div className="content-area">{renderContent()}</div>
+        <div className="content-area">
+          {loading ? (
+            <div className="loading">Loading Dashboard...</div>
+          ) : transcripts.length === 0 ? (
+            // If the user has no transcripts, show the new welcome component
+            <EmptyDashboard setActiveComponent={setActiveComponent} />
+          ) : (
+            // Otherwise, show the normal content based on the active component
+            renderContent()
+          )}
+        </div>
       </div>
     </div>
   );
