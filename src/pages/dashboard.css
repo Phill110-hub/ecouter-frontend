@@ -214,3 +214,44 @@
   cursor: pointer;
   color: #f55;
 }
+.empty-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  padding: 2rem;
+  background-color: #1c1c1c;
+  border-radius: 12px;
+  color: #ccc;
+}
+
+.empty-dashboard h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.empty-dashboard p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.empty-dashboard-button {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.empty-dashboard-button:hover {
+  background-color: #0056b3;
+}
