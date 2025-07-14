@@ -131,28 +131,24 @@
   background-color: rgba(255, 77, 77, 0.1);
   border: 1px solid #ff4d4d;
   padding: 10px;
+  
 /* --- Add this new class to your CSS file --- */
 
 .forgot-password-link {
-  /* This is the key part that pushes the link to the right */
-  align-self: flex-end;
-
-  /* Styling */
-  color: #aaa; /* A subtle grey color */
+  align-self: flex-end; /* Pushes the link to the right */
+  color: #aaa;
   font-size: 0.85rem;
   text-decoration: none;
-  margin-top: -8px; /* Negative margin to pull it closer to the password field */
-  margin-bottom: 8px; /* Adds a little space before the login button */
+  background: none; /* Make it look like a link, not a button */
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: -8px;
+  margin-bottom: 8px;
   transition: color 0.3s ease;
 }
 
 .forgot-password-link:hover {
-  color: #fff; /* Brightens on hover */
+  color: #fff;
   text-decoration: underline;
-}
-
-  border-radius: 8px;
-  text-align: center;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
 }
