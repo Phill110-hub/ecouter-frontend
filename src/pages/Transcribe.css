@@ -158,3 +158,13 @@
   line-height: 1.6;
   color: #ddd;
 }
+/* Highlight flash effect */
+.highlight-flash {
+  animation: flashBorder 1s ease-in-out 3;
+}
+
+@keyframes flashBorder {
+  0% { box-shadow: 0 0 0px white; }
+  50% { box-shadow: 0 0 10px white; }
+  100% { box-shadow: 0 0 0px white; }
+}
